@@ -1,7 +1,7 @@
 Package: cati
 Type: Package
 Title: A package for community assembly testing using individuals traits
-Version: 0.1
+Version: 0.2
 Date: 2014-02-26
 Author: c(person("Adrien", "Taudiere", role = c("aut", "cre"),
 		email = "adrien.taudiere@cefe.ncrs.fr"),
