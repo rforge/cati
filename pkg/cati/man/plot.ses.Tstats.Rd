@@ -70,7 +70,7 @@
 
 \examples{
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 
 	plot.ses.Tstats(res.finch)
 	plot.ses.Tstats(res.finch, type="color_cond")

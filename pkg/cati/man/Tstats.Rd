@@ -13,7 +13,7 @@
 
 \arguments{
 	\item{Ttraits}{
-		Individual traits matrix with traits in column.
+		Individual traits matrix with traits in columns.
 	}
 	
 	\item{ind_plot}{
@@ -87,7 +87,7 @@
 
 \examples{
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 	summary.Tstats(res.finch)
 	
 	#Plot functions

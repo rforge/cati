@@ -76,17 +76,17 @@
 
 \examples{	
 	data(finch.ind)
-	plot.dens(traits.finch, sp.finch, ind.plot.finch, ylim.cex=3)
-	plot.dens(traits.finch, ind.plot.finch, sp.finch, ylim.cex=8)
+	plot.dens(traits.finch, sp.finch, ind.plot_finch, ylim.cex=3)
+	plot.dens(traits.finch, ind.plot_finch, sp.finch, ylim.cex=8)
 	plot.dens(traits.finch, rep("region", times=dim(traits.finch)[1]), sp.finch, ylim.cex=6)
-	plot.dens(traits.finch, rep("toutes_sp", times=dim(traits.finch)[1]), ind.plot.finch,ylim.cex=3)
+	plot.dens(traits.finch, rep("toutes_sp", times=dim(traits.finch)[1]), ind.plot_finch,ylim.cex=3)
 	
-	plot.dens(traits.finch, sp.finch, ind.plot.finch, ylim.cex=3, sort.by.trait=T)
-	plot.dens(traits.finch, ind.plot.finch, sp.finch, ylim.cex=3, sort.by.trait=T)
+	plot.dens(traits.finch, sp.finch, ind.plot_finch, ylim.cex=3, sort.by.trait = TRUE)
+	plot.dens(traits.finch, ind.plot_finch, sp.finch, ylim.cex=3, sort.by.trait = TRUE)
 	
-	plot.dens(traits.finch, ind.plot.finch, sp.finch, ylim.cex=3, sort.by.trait=F)
+	plot.dens(traits.finch, ind.plot_finch, sp.finch, ylim.cex=3, sort.by.trait = FALSE)
 	
-	plot.dens(traits.finch, ind.plot.finch, sp.finch, ylim.cex=3, plot.ask=F, polyg=F)
+	plot.dens(traits.finch, ind.plot_finch, sp.finch, ylim.cex=3, plot.ask = FALSE, polyg = FALSE)
 }
 
 

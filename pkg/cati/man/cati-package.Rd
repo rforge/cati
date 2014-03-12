@@ -1,6 +1,6 @@
-\name{ComInd-package}
-\alias{ComInd-package}
-\alias{ComInd}
+\name{cati-package}
+\alias{cati-package}
+\alias{cati}
 \docType{package}
 
 \title{
@@ -21,7 +21,7 @@
 	Depends: \tab ape, nlme, e1071, moments, lattice, R(>=3.0.0) \cr
 	Suggests: \tab rasterVis \cr
 	}
-	This package provide function to calculate T-statistics (Tstats function) and other uni-traits metrics (com.index & com.index.c functions) to test community assembly considering the individual and other taxonomic levels. Variance partition (partvar function) and density plot for community studies (plot.dens function) are also available. Finaly, this package include function to summarise index and function to plot standardized effect size of index (e.g. plot.ses function). 
+	This package provide functions to calculate T-statistics (Tstats function) and other uni-traits metrics (com.index & com.index.c functions) to test community assembly considering the individual and other taxonomic levels. Variance partition (partvar function) and density plot for community studies (plot.dens function) are also available. Finaly, this package include function to summarise index and function to plot standardized effect size of index (e.g. plot.ses function). 
 }
 
 \author{
@@ -49,14 +49,12 @@
 	plot.ses(list.ses)
 	
 	#Others classicals index (mean, range, CV.NND and kurtosis). Use com.index function for custom function
-	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, name_sp_sites=name_sp_site.finch, pop.aggregate=F)
+	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate = FALSE)
 
-	index.list<-list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, 
-	                 T_IC.IR=res.finch$T_IC.IR, T_IC.IR_nm=res.finch$T_IC.IR_nm, 
-	                 T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm,
-	                 range.ind=res.finch.ind$Range_obs, range.ind.null=res.finch.ind$Null_range,
-	                 mean.ind=res.finch.ind$Mean_obs, mean.ind.null=res.finch.ind$Null_mean,
-	                 CV.ind=res.finch.ind$CV.NND_obs, CV.ind.null=res.finch.ind$Null_CV)         
+	list.ses2<-list( range.ind=t(res.finch.ind$Range_obs), range.ind.null=res.finch.ind$Null_range, mean.ind=t(res.finch.ind$Mean_obs), mean.ind.null=res.finch.ind$Null_mean, CV.ind=t(res.finch.ind$CV.NND_obs), CV.ind.null=res.finch.ind$Null_CV)
 	
-	plot.filter(index.list)
+	plot.ses(list.ses2)
+	
+	plot.ses(c(list.ses, list.ses2))
+	plot.filter(c(list.ses, list.ses2))
 }

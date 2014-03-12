@@ -63,14 +63,14 @@
 }
 
 \value{
-None; used for the side-effect of producing a plot.
+	None; used for the side-effect of producing a plot.
 }
 
 \references{
 }
 
 \author{
-Adrien Taudiere
+	Adrien Taudiere
 }
 
 \note{
@@ -79,6 +79,7 @@ Adrien Taudiere
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
+	\code{\link{plot.ses.multi}};
 	\code{\link{plot.filter}};
 	\code{\link{plot.ses.Tstats}};
 	\code{\link{plot.ses.var}}
@@ -86,7 +87,7 @@ Adrien Taudiere
 
 \examples{
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 	
 	list.ses<-list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm, T_IC.IR=res.finch$T_IC.IR, T_IC.IR_nm=res.finch$T_IC.IR_nm)
 	
@@ -99,8 +100,8 @@ Adrien Taudiere
 	plot.ses(list.ses, type="simple_range")
 	plot.ses(list.ses, type="barplot")
 	
-	plot.ses(list.ses, color.cond=F)
-	plot.ses(list.ses, type="simple", add.conf=F)
+	plot.ses(list.ses, color.cond = FALSE)
+	plot.ses(list.ses, type="simple", add.conf = FALSE)
 }
 
 

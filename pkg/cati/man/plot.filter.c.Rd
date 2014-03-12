@@ -84,18 +84,18 @@ None; used for the side-effect of producing a plot.
 }
 
 \examples{
-data(finch.ind)
+	data(finch.ind)
 	
 	#Calcul using individuals values
-	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=F)
+	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate=FALSE)
 	
 	#Calcul using populational values
-	res.finch.sp<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=TRUE)
+	res.finch.sp<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate=TRUE)
 	
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 		
-	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites=TRUE )
-	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites=FALSE )
+	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites=TRUE, plot.ask = FALSE)
+	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites=FALSE, plot.ask = FALSE )
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

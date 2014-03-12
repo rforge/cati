@@ -78,30 +78,23 @@
 
 \examples{	
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
-	res.finch.sp<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=TRUE)
-	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=F)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
+	res.finch.sp<-com.index.c(traits = traits.finch, ind.plot = ind.plot_finch, nperm = 99, sp = sp.finch, pop.aggregate = TRUE)
+	res.finch.ind<-com.index.c(traits = traits.finch, ind.plot = ind.plot_finch, nperm = 99, sp = sp.finch, pop.aggregate = FALSE)
 	
 	index.list<-list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, 
 	                 T_IC.IR=res.finch$T_IC.IR, T_IC.IR_nm=res.finch$T_IC.IR_nm, 
 	                 T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm,
-	                 range.ind=res.finch.ind$Range_obs, range.ind.null=res.finch.ind$Null_range,
-	                 mean.ind=res.finch.ind$Mean_obs, mean.ind.null=res.finch.ind$Null_mean,
-	                 CV.ind=res.finch.ind$CV.NND_obs, CV.ind.null=res.finch.ind$Null_CV,
-	                 kurtosis.ind=res.finch.ind$kurtosis_obs, kurtosis.ind.null=res.finch.ind$Null_kurtosis,
-	                 range.sp=res.finch.sp$Range_obs, range.sp.null=res.finch.sp$Null_range,
-	                 mean.sp=res.finch.sp$Mean_obs, mean.sp.null=res.finch.sp$Null_mean,
-	                 CV.sp=res.finch.sp$CV.NND_obs, CV.sp.null=res.finch.sp$Null_CV,
-	                 kurtosis.sp=res.finch.sp$kurtosis_obs, kurtosis.sp.null=res.finch.sp$Null_kurtosis)         
+	                 range.ind=t(res.finch.ind$Range_obs), range.ind.null=res.finch.ind$Null_range,
+	                 mean.ind=t(res.finch.ind$Mean_obs), mean.ind.null=res.finch.ind$Null_mean,
+	                 CV.ind=t(res.finch.ind$CV.NND_obs), CV.ind.null=res.finch.ind$Null_CV,
+	                 kurtosis.ind=t(res.finch.ind$kurtosis_obs), kurtosis.ind.null=res.finch.ind$Null_kurtosis,
+	                 range.sp=t(res.finch.sp$Range_obs), range.sp.null=res.finch.sp$Null_range,
+	                 mean.sp=t(res.finch.sp$Mean_obs), mean.sp.null=res.finch.sp$Null_mean,
+	                 CV.sp=t(res.finch.sp$CV.NND_obs), CV.sp.null=res.finch.sp$Null_CV,
+	                 kurtosis.sp=t(res.finch.sp$kurtosis_obs), kurtosis.sp.null=res.finch.sp$Null_kurtosis)         
 	
 	plot.filter(index.list)
-	plot.ses(index.list)
-	plot.ses.var(index.list, table(ind.plot.finch))
-	
-	plot.filter(list(range.ind=res.finch.ind$Range_obs, range.ind.null=res.finch.ind$Null_range,
-	                 mean.ind=res.finch.ind$Mean_obs, mean.ind.null=res.finch.ind$Null_mean,
-	                 CV.ind=res.finch.ind$CV.NND_obs, CV.ind.null=res.finch.ind$Null_CV,
-	                 kurtosis.ind=res.finch.ind$kurtosis_obs, kurtosis.ind.null=res.finch.ind$Null_kurtosis))
 	
 	plot.filter(list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, 
 	                 T_IC.IR=res.finch$T_IC.IR, T_IC.IR_nm=res.finch$T_IC.IR_nm, 
@@ -109,7 +102,7 @@
 	
 	plot.filter(list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, 
 	                 T_IC.IR=res.finch$T_IC.IR, T_IC.IR_nm=res.finch$T_IC.IR_nm, 
-	                 T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm), bysites=F)
+	                 T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm), bysites=FALSE)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

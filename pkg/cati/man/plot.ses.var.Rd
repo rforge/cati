@@ -61,12 +61,13 @@
 
 \examples{
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 
 	list.ses<-list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm, T_IC.IR=res.finch$T_IC.IR, T_IC.IR_nm=res.finch$T_IC.IR_nm)
 	
 	#Plot index SES against species richness
-	plot.ses.var(list.ses, table(ind.plot.finch))
+	plot.ses.var(list.ses, table(ind.plot_finch))
+	plot.ses.var(list.ses, table(ind.plot_finch), resume=TRUE)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

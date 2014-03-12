@@ -10,7 +10,7 @@
 }
 
 \usage{
-	com.index.c(traits = NULL, ind.plot = NULL, sp = NULL, proba = NULL, nperm = 99, val.quant = c(0.025, 0.975), pop.aggregate = TRUE, printprogress = TRUE)
+	com.index.c(traits = NULL, ind.plot = NULL, sp = NULL, proba = NULL, nperm = 99, val.quant = c(0.025, 0.975), printprogress = TRUE, pop.aggregate = TRUE)
 }
 
 \arguments{
@@ -38,12 +38,12 @@
 		Numeric vectors of length 2, giving the quantile to calcul confidence interval. By default val.quant=c(0.025,0.975) for a bilateral test with alpha = 5\%.
 	}
 	
-	\item{pop.aggregate}{
-		Logical value; Calcul the index using population traits (mean of all individuals of one species in one site) instead of individuals traits. 
-	}
-	
 	\item{printprogress}{
 		Logical value; print progress during the calcul or not.
+	}
+		
+	\item{pop.aggregate}{
+		Logical value; Calcul the index using population traits (mean of all individuals of one species in one site) instead of individuals traits. 
 	}
 }
 
@@ -111,15 +111,15 @@
 	data(finch.ind)
 	
 	#Calcul using individuals values
-	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=F)
+	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate = FALSE)
 	
 	#Calcul using populational values
-	res.finch.sp<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=TRUE)
+	res.finch.sp<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate = TRUE)
 	
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 		
-	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites=TRUE )
-	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites=FALSE )
+	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites = TRUE )
+	plot.filter.c(com.object.ind=res.finch.ind, com.object.sp=res.finch.sp, tstats=res.finch, val.quant=c(0.025, 0.975), bysites = FALSE )
 	
 	plot.com(res.finch.ind)	
 }

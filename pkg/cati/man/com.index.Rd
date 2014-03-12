@@ -20,7 +20,7 @@
 	}
 	
 	\item{index}{
-		A vector of function to apply to traits vectors in the form "mean(x, na.rm=T)" or "range(x)".
+		A vector of function to apply to traits vectors in the form "mean(x, na.rm = TRUE)" or "range(x)".
 	}
 	
 	\item{namesindex}{
@@ -87,6 +87,7 @@ In most case, model 1 and 2 correspond to index at the individual level and the 
 
 \seealso{
 	\code{\link{com.index.c}};
+	\code{\link{com.index.multi}};
 	\code{\link{plot.filter}};
 	\code{\link{ses}};
 	\code{\link{plot.ses}}
@@ -99,27 +100,27 @@ In most case, model 1 and 2 correspond to index at the individual level and the 
 	#simple function (mean and var)
 	#Null model 1 is trivial for this simple function because randomisation is whithin community only
 	
-	res.finch.ind_mean_var1<-com.index(traits=traits.finch, index=c("mean(x, na.rm=T)", "var(x, na.rm=T)"), sp=sp.finch , nullmodels=c(1,1), ind.plot=ind.plot.finch, nperm=NULL)
+	res.finch.ind_mean_var1<-com.index(traits=traits.finch, index=c("mean(x, na.rm = TRUE)", "var(x, na.rm = TRUE)"), sp=sp.finch , nullmodels=c(1,1), ind.plot=ind.plot_finch, nperm=NULL)
 	res.finch.ind_mean_var1$obs$mean
 	
-	res.finch.ind_mean_var2<-com.index(traits=traits.finch, index=c("mean(x, na.rm=T)", "var(x, na.rm=T)"), sp=sp.finch , nullmodels=c(2,2), ind.plot=ind.plot.finch, nperm=99)
+	res.finch.ind_mean_var2<-com.index(traits=traits.finch, index=c("mean(x, na.rm = TRUE)", "var(x, na.rm = TRUE)"), sp=sp.finch , nullmodels=c(2,2), ind.plot=ind.plot_finch, nperm=99)
 	res.finch.ind_mean_var2$obs$mean
 	res.finch.ind_mean_var2$Null$mean
 	ses(res.finch.ind_mean_var2$obs$mean, res.finch.ind_mean_var2$Null$mean)
 	
 	
-	res.finch.ind_mean_var3<-com.index(traits=traits.finch, index=c("mean(x, na.rm=T)", "var(x, na.rm=T)"), sp=sp.finch , nullmodels=c(3,3), ind.plot=ind.plot.finch, nperm=99)
+	res.finch.ind_mean_var3<-com.index(traits=traits.finch, index=c("mean(x, na.rm = TRUE)", "var(x, na.rm = TRUE)"), sp=sp.finch , nullmodels=c(3,3), ind.plot=ind.plot_finch, nperm=99)
 	res.finch.ind_mean_var3$obs$mean
 	ses(res.finch.ind_mean_var3$obs$mean, res.finch.ind_mean_var3$Null$mean)
 	
 	#_________________
 	#More complex function: mean & var by population
 	
-	res.finch.ind_mean_var.by.pop1<-com.index(traits=traits.finch, index=c("tapply(x, paste(sp.finch, ind.plot.finch), function(x) mean(x, na.rm=T))", "tapply(x, paste(sp.finch, ind.plot.finch), function(x) sd(x, na.rm=T))"), sp=sp.finch , nullmodels=c(1,1), ind.plot=ind.plot.finch, nperm=99, namesindex=c("mean_1","sd_1"))
+	res.finch.ind_mean_var.by.pop1<-com.index(traits=traits.finch, index=c("tapply(x, paste(sp.finch, ind.plot_finch), function(x) mean(x, na.rm = TRUE))", "tapply(x, paste(sp.finch, ind.plot_finch), function(x) sd(x, na.rm = TRUE))"), sp=sp.finch , nullmodels=c(1,1), ind.plot=ind.plot_finch, nperm=99, namesindex=c("mean_1","sd_1"))
 	ses(res.finch.ind_mean_var.by.pop1$obs$mean, res.finch.ind_mean_var.by.pop1$Null$mean)$ses
 	plot.ses(res.finch.ind_mean_var.by.pop1$list.index)
 	
-	res.finch.ind_mean_var.by.pop2<-com.index(traits=traits.finch, index=c("tapply(x, paste(sp.finch, ind.plot.finch), function(x) mean(x, na.rm=T))", "tapply(x, paste(sp.finch, ind.plot.finch), function(x) sd(x, na.rm=T))"), sp=sp.finch , nullmodels=c(2,2), ind.plot=ind.plot.finch, nperm=99, namesindex=c("mean_2","sd_2"))
+	res.finch.ind_mean_var.by.pop2<-com.index(traits=traits.finch, index=c("tapply(x, paste(sp.finch, ind.plot_finch), function(x) mean(x, na.rm = TRUE))", "tapply(x, paste(sp.finch, ind.plot_finch), function(x) sd(x, na.rm = TRUE))"), sp=sp.finch , nullmodels=c(2,2), ind.plot=ind.plot_finch, nperm=99, namesindex=c("mean_2","sd_2"))
 	ses(res.finch.ind_mean_var.by.pop2$obs$mean, res.finch.ind_mean_var.by.pop2$Null$mean)$ses
 	plot.ses(res.finch.ind_mean_var.by.pop2$list.index)
 	
@@ -129,11 +130,11 @@ In most case, model 1 and 2 correspond to index at the individual level and the 
 	#More complex function: mean by sites using population means
 	
 	sites.pop<-unlist(strsplit(rownames(res.finch.ind_mean_var.by.pop1$obs$mean), split=" "))[seq(2,2*length(rownames(res.finch.ind_mean_var.by.pop1$obs$mean)),by=2)]
-	apply(res.finch.ind_mean_var.by.pop1$obs$mean, 2, function(x) tapply(x, sites.pop, mean, na.rm=T)  )
+	apply(res.finch.ind_mean_var.by.pop1$obs$mean, 2, function(x) tapply(x, sites.pop, mean, na.rm = TRUE)  )
 	
-	ses(apply(res.finch.ind_mean_var.by.pop1$obs$mean, 2, function(x) tapply(x, sites.pop, mean, na.rm=T)), apply(res.finch.ind_mean_var.by.pop1$Null$mean, c(1,3), function(x) tapply(x, sites.pop, mean, na.rm=T)  ))
+	ses(apply(res.finch.ind_mean_var.by.pop1$obs$mean, 2, function(x) tapply(x, sites.pop, mean, na.rm = TRUE)), apply(res.finch.ind_mean_var.by.pop1$Null$mean, c(1,3), function(x) tapply(x, sites.pop, mean, na.rm = TRUE)  ))
 	
-	plot.ses(list(Mean.by.pop_obs=apply(res.finch.ind_mean_var.by.pop1$obs$mean, 2, function(x) tapply(x, sites.pop, mean, na.rm=T)), Mean.by.pop_Null=apply(res.finch.ind_mean_var.by.pop1$Null$mean, c(1,3), function(x) tapply(x, sites.pop, mean, na.rm=T)  ), sd.by.pop_obs=apply(res.finch.ind_mean_var.by.pop1$obs$sd, 2, function(x) tapply(x, sites.pop, mean, na.rm=T)), sd.by.pop_Null=apply(res.finch.ind_mean_var.by.pop1$Null$sd, c(1,3), function(x) tapply(x, sites.pop, mean, na.rm=T)  )  ) )
+	plot.ses(list(Mean.by.pop_obs=apply(res.finch.ind_mean_var.by.pop1$obs$mean, 2, function(x) tapply(x, sites.pop, mean, na.rm = TRUE)), Mean.by.pop_Null=apply(res.finch.ind_mean_var.by.pop1$Null$mean, c(1,3), function(x) tapply(x, sites.pop, mean, na.rm = TRUE)  ), sd.by.pop_obs=apply(res.finch.ind_mean_var.by.pop1$obs$sd, 2, function(x) tapply(x, sites.pop, mean, na.rm = TRUE)), sd.by.pop_Null=apply(res.finch.ind_mean_var.by.pop1$Null$sd, c(1,3), function(x) tapply(x, sites.pop, mean, na.rm = TRUE)  )  ) )
 
 }
 

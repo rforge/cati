@@ -66,10 +66,10 @@ plot.cor.Tstats(tstats = NULL, val.quant = c(0.025, 0.975), add.text = FALSE, by
 
 \examples{
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
 	
-	plot.cor.Tstats(res.finch, obj="traits")
-	plot.cor.Tstats(res.finch, obj="sites")
+	plot.cor.Tstats(res.finch, bysites = FALSE)
+	plot.cor.Tstats(res.finch, bysites = TRUE)
 }
 
 

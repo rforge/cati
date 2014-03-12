@@ -61,7 +61,7 @@
 
 \examples{
 	data(finch.ind)
-	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=F)
+	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate = FALSE)
 	plot.com(res.finch.ind)
 }
 

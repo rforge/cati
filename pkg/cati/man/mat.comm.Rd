@@ -62,8 +62,8 @@ mat.comm(com.object = NULL, tstats = NULL, val.quant = c(0.025, 0.975), sites_na
 
 \examples{
 	data(finch.ind)
-	res.finch<-Tstats(traits.finch, ind_plot=ind.plot.finch, sp=sp.finch, nperm=99)
-	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot.finch, nperm=99, sp=sp.finch, pop.aggregate=F)
+	res.finch<-Tstats(traits.finch, ind_plot=ind.plot_finch, sp=sp.finch, nperm=99)
+	res.finch.ind<-com.index.c(traits=traits.finch, ind.plot=ind.plot_finch, nperm=99, sp=sp.finch, pop.aggregate = FALSE)
 
 	mat.comm(com.object=res.finch.ind,tstats=res.finch, method="ses")
 	mat.comm(com.object=res.finch.ind,tstats=res.finch, method="ses",val.quant=c(0.05,0.95))
@@ -72,7 +72,6 @@ mat.comm(com.object = NULL, tstats = NULL, val.quant = c(0.025, 0.975), sites_na
 	mat.comm(com.object=res.finch.ind,tstats=res.finch, method="p.val",val.quant=c(0.05,0.95))
 	mat.comm(com.object=res.finch.ind,tstats=res.finch, method="p.val",val.quant=c(0,0.95))
 		
-	require(rasterVis)
 	# Custom theme (from rasterVis package)
 	my.theme <- BuRdTheme()
 	# Customize the colorkey
