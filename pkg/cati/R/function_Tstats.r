@@ -1,15 +1,15 @@
 #Function for Tstats Package					
 
 ### Function to calcul Tstats 
-Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.value=TRUE, ...){
+Tstats<-function(Ttraits, ind_plot, sp, nperm=NULL, printprogress=TRUE, p.value=TRUE){
 	#6 variances: I: individual, P: population, C: community, R: region
 	#IP; IC; IR; PC; PR; CR
 	
-	#Ttraits is the matrix of individual traits, Tind_plot is the name of the plot in which the individu is (factor type), and Tsp is the species name of each individual
+	#Ttraits is the matrix of individual traits, ind_plot is the name of the plot in which the individu is (factor type), and sp is the species name of each individual
 	
-	names_sp_ind_plot<-as.factor(paste(Tsp, Tind_plot, sep="@")) 
-	Tplotsp=unlist(strsplit(levels(names_sp_ind_plot),split="@"))[2*(1:nlevels(names_sp_ind_plot))]; names(Tplotsp)=levels(names_sp_ind_plot);
-	#Tplotsp is the plot in wich the population is
+	names_sp_ind_plot<-as.factor(paste(sp, ind_plot, sep="@")) 
+	Tplosp=unlist(strsplit(levels(names_sp_ind_plot),split="@"))[2*(1:nlevels(names_sp_ind_plot))]; names(Tplosp)=levels(names_sp_ind_plot);
+	#Tplosp is the plot in wich the population is
   
   
 	######################################## 
@@ -19,30 +19,30 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 	#________________________________________
 	#Objects creation
 	mean_IP<-matrix(nrow=nlevels(names_sp_ind_plot), ncol=ncol(Ttraits)); rownames(mean_IP)=levels(names_sp_ind_plot);
-	mean_PC<-matrix(nrow=nlevels(Tind_plot), ncol=ncol(Ttraits))
+	mean_PC<-matrix(nrow=nlevels(ind_plot), ncol=ncol(Ttraits))
 	var_IP<-matrix(nrow=nlevels(names_sp_ind_plot), ncol=ncol(Ttraits))
-	var_PC<-matrix(nrow=nlevels(Tind_plot), ncol=ncol(Ttraits))
+	var_PC<-matrix(nrow=nlevels(ind_plot), ncol=ncol(Ttraits))
 	var_CR<-vector()
-	var_IC<-matrix(nrow=nlevels(Tind_plot), ncol=ncol(Ttraits))
+	var_IC<-matrix(nrow=nlevels(ind_plot), ncol=ncol(Ttraits))
 	var_PR<-vector()
 	var_IR<-vector()
-	T_IP.IC<-matrix(nrow=nlevels(Tind_plot), ncol=ncol(Ttraits))
-	T_IC.IR<-matrix(nrow=nlevels(Tind_plot), ncol=ncol(Ttraits))
-	T_PC.PR<-matrix(nrow=nlevels(Tind_plot), ncol=ncol(Ttraits))
+	T_IP.IC<-matrix(nrow=nlevels(ind_plot), ncol=ncol(Ttraits))
+	T_IC.IR<-matrix(nrow=nlevels(ind_plot), ncol=ncol(Ttraits))
+	T_PC.PR<-matrix(nrow=nlevels(ind_plot), ncol=ncol(Ttraits))
   
 	for (t in 1: ncol(Ttraits)){
 		mean_IP[,t]<-tapply(Ttraits[,t], names_sp_ind_plot  ,mean, na.rm=T)
-		mean_PC[,t]<-tapply(mean_IP[,t], Tplotsp , mean, na.rm=T)
+		mean_PC[,t]<-tapply(mean_IP[,t], Tplosp , mean, na.rm=T)
 		
 		var_IP[,t]<-tapply(Ttraits[,t], names_sp_ind_plot, var, na.rm=T)
-		var_PC[,t]<-tapply(mean_IP[,t], Tplotsp  ,var, na.rm=T)
+		var_PC[,t]<-tapply(mean_IP[,t], Tplosp  ,var, na.rm=T)
 		var_CR[t]<-var(mean_PC[,t], na.rm=T)
-		var_IC[,t]<-tapply(Ttraits[,t], Tind_plot  ,var, na.rm=T)
+		var_IC[,t]<-tapply(Ttraits[,t], ind_plot  ,var, na.rm=T)
 		var_PR[t]<-var(as.vector(mean_IP[,t]), na.rm=T)
 		var_IR[t]<-var(Ttraits[,t], na.rm=T)
 		  
-		for(s in 1 : nlevels(Tind_plot)){
-			T_IP.IC[s,t]<-mean(var_IP[grepl(levels(Tind_plot)[s],Tplotsp),t], na.rm=T)/var_IC[s,t]
+		for(s in 1 : nlevels(ind_plot)){
+			T_IP.IC[s,t]<-mean(var_IP[grepl(levels(ind_plot)[s],Tplosp),t], na.rm=T)/var_IC[s,t]
 			T_IC.IR[s,t]<-var_IC[s,t]/var_IR[t]
 			T_PC.PR[s,t]<-var_PC[s,t]/var_PR[t]
 		}
@@ -56,23 +56,23 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 	
 	if(is.numeric(nperm)){
 		
-		var_IP_nm1<-array(dim=c(nperm,ncol(Ttraits),nrow=length(Tplotsp)))
-		var_PC_nm3<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
-		var_IC_nm1<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
-		var_IC_nm2<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
+		var_IP_nm1<-array(dim=c(nperm,ncol(Ttraits),nrow=length(Tplosp)))
+		var_PC_nm3<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
+		var_IC_nm1<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
+		var_IC_nm2<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
 		var_PR_nm3<-array(dim=c(nperm,ncol(Ttraits)))
 		var_IR_nm2<-array(dim=c(nperm,ncol(Ttraits)))
        
-		mean_IP_nm3<-array(dim=c(nperm,ncol(Ttraits),length(Tplotsp)))
-		mean_PC_nm3<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
+		mean_IP_nm3<-array(dim=c(nperm,ncol(Ttraits),length(Tplosp)))
+		mean_PC_nm3<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
        
 		Ttraits.nm1<-list()
 		Ttraits.nm2<-list()
 		Ttraits.nm3<-list()
               
-		T_IP.IC_nm1<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
-		T_IC.IR_nm2<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
-		T_PC.PR_nm3<-array(dim=c(nperm,ncol(Ttraits),nlevels(Tind_plot)))
+		T_IP.IC_nm1<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
+		T_IC.IR_nm2<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
+		T_PC.PR_nm3<-array(dim=c(nperm,ncol(Ttraits),nlevels(ind_plot)))
       
        
 		#Creation of three null models 
@@ -82,11 +82,11 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		#modèle nul 1: permutation des valeurs de traits des individus dans la communauté   
 		for (t in 1: ncol(Ttraits)){
 			Ttraits.nm1[[t]]<-list()
-			for(s in 1:  nlevels(Tind_plot)) {
+			for(s in 1:  nlevels(ind_plot)) {
 				Ttraits.nm1[[t]][[s]]<-list()
 				for(i in 1:nperm){
-					if (length(Ttraits[Tind_plot==levels(Tind_plot)[s], t]) != 1) {
-						perm_ind_plot1<-sample(Ttraits[Tind_plot==levels(Tind_plot)[s], t], table(Tind_plot)[s])
+					if (length(Ttraits[ind_plot==levels(ind_plot)[s], t]) != 1) {
+						perm_ind_plot1<-sample(Ttraits[ind_plot==levels(ind_plot)[s], t], table(ind_plot)[s])
 						Ttraits.nm1[[t]][[s]][[i]]<-perm_ind_plot1
 					}
 					else {Ttraits.nm1[[t]][[s]][[i]]<-"NA"}
@@ -99,10 +99,10 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		#modèle nul 2: permutation des valeurs de traits des individus de la région    
 		for (t in 1: ncol(Ttraits)){
 			Ttraits.nm2[[t]]<-list()
-			for(s in 1:  nlevels(Tind_plot)) {
+			for(s in 1:  nlevels(ind_plot)) {
 				Ttraits.nm2[[t]][[s]]<-list()
 				for(i in 1:nperm){
-					perm_ind_plot2<-sample(Ttraits[, t], table(Tind_plot)[s])
+					perm_ind_plot2<-sample(Ttraits[, t], table(ind_plot)[s])
 					Ttraits.nm2[[t]][[s]][[i]]<-perm_ind_plot2
 				}
 			}
@@ -117,10 +117,10 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 				
 		for (t in 1: ncol(Ttraits)){
 			Ttraits.nm3[[t]]<-list()
-			for(s in 1:  nlevels(Tind_plot)){
+			for(s in 1:  nlevels(ind_plot)){
 				Ttraits.nm3[[t]][[s]]<-list()
 				for(i in 1:nperm){
-					perm_ind_plot3<-sample(Ttraits_by_pop, table(Tind_plot)[s])
+					perm_ind_plot3<-sample(Ttraits_by_pop, table(ind_plot)[s])
 					Ttraits.nm3[[t]][[s]][[i]]<-perm_ind_plot3
 				}
 			} 
@@ -139,7 +139,7 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		for (t in 1: ncol(Ttraits)){
 			for(i in 1:nperm){ 
 				mean_IP_nm3[i,t,]<-tapply(unlist(Ttraits.nm3[[t]])[(1+(i-1)*yy) : (i*yy)], names_sp_ind_plot  ,function(x) mean(x, na.rm=T))
-				mean_PC_nm3[i,t,]<-tapply(mean_IP_nm3[i,t,], Tplotsp, mean, na.rm=T)
+				mean_PC_nm3[i,t,]<-tapply(mean_IP_nm3[i,t,], Tplosp, mean, na.rm=T)
 			}
 			if(printprogress==T){print(paste(round(t/ncol(Ttraits)/3*100, 2),"%"))} else {}
 		} 
@@ -148,9 +148,9 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		for (t in 1: ncol(Ttraits)){
 			for(i in 1:nperm){
 				var_IP_nm1[i,t,]<-tapply(unlist(Ttraits.nm1[[t]])[(1+(i-1)*yy) : (i*yy)], names_sp_ind_plot  ,function(x) var(x, na.rm=T))
-				var_PC_nm3[i,t,]<-tapply(mean_IP_nm3[i,t,], Tplotsp  ,var, na.rm=T)
-				var_IC_nm1[i,t,]<-tapply(unlist(Ttraits.nm1[[t]])[(1+(i-1)*yy) : (i*yy)], Tind_plot  ,function(x) var(x, na.rm=T))
-				var_IC_nm2[i,t,]<-tapply(unlist(Ttraits.nm2[[t]])[(1+(i-1)*yy) : (i*yy)], Tind_plot  ,function(x) var(x, na.rm=T))
+				var_PC_nm3[i,t,]<-tapply(mean_IP_nm3[i,t,], Tplosp  ,var, na.rm=T)
+				var_IC_nm1[i,t,]<-tapply(unlist(Ttraits.nm1[[t]])[(1+(i-1)*yy) : (i*yy)], ind_plot  ,function(x) var(x, na.rm=T))
+				var_IC_nm2[i,t,]<-tapply(unlist(Ttraits.nm2[[t]])[(1+(i-1)*yy) : (i*yy)], ind_plot  ,function(x) var(x, na.rm=T))
 				var_PR_nm3[i,t]<-var(as.vector(mean_IP_nm3[i,t,]), na.rm=T)
 				var_IR_nm2[i,t]<-var(unlist(Ttraits.nm2[[t]])[(1+(i-1)*yy) : (i*yy)], na.rm=T)
 			}
@@ -160,8 +160,8 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		   
 		for (t in 1: ncol(Ttraits)){
 			for(i in 1:nperm){
-				for(s in 1 : nlevels(Tind_plot)){
-					T_IP.IC_nm1[i,t,s]<-mean(var_IP_nm1[i,t,grepl(levels(Tind_plot)[s],Tplotsp)], na.rm=T)/var_IC_nm1[i,t,s] 
+				for(s in 1 : nlevels(ind_plot)){
+					T_IP.IC_nm1[i,t,s]<-mean(var_IP_nm1[i,t,grepl(levels(ind_plot)[s],Tplosp)], na.rm=T)/var_IC_nm1[i,t,s] 
 					T_IC.IR_nm2[i,t,s]<-var_IC_nm2[i,t,s]/var_IR_nm2[i,t]
 					T_PC.PR_nm3[i,t,s]<-var_PC_nm3[i,t,s]/var_PR_nm3[i,t]
 				}
@@ -181,9 +181,9 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		colnames(T_PC.PR_nm3)<-colnames(Ttraits)
 	}
 	
-	rownames(T_IP.IC)<-levels(Tplotsp)
-  	rownames(T_IC.IR)<-levels(Tplotsp)
- 	rownames(T_PC.PR)<-levels(Tplotsp)
+	rownames(T_IP.IC)<-levels(as.factor(Tplosp))
+  	rownames(T_IC.IR)<-levels(as.factor(Tplosp))
+ 	rownames(T_PC.PR)<-levels(as.factor(Tplosp))
  
 	
 	#________________________________________
@@ -214,16 +214,16 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
  	print("calcul of p.value")
  	
  	if(p.value==T){
-		p.valueT_IP.IC.sup<-matrix(ncol=ncol(Ttraits), nrow= nlevels(Tind_plot))
-		p.valueT_IC.IR.sup<-matrix(ncol=ncol(Ttraits), nrow= nlevels(Tind_plot))
-		p.valueT_PC.PR.sup<-matrix(ncol=ncol(Ttraits), nrow= nlevels(Tind_plot))
+		p.valueT_IP.IC.sup<-matrix(ncol=ncol(Ttraits), nrow= nlevels(ind_plot))
+		p.valueT_IC.IR.sup<-matrix(ncol=ncol(Ttraits), nrow= nlevels(ind_plot))
+		p.valueT_PC.PR.sup<-matrix(ncol=ncol(Ttraits), nrow= nlevels(ind_plot))
 		
-		p.valueT_IP.IC.inf<-matrix(ncol=ncol(Ttraits), nrow= nlevels(Tind_plot))
-		p.valueT_IC.IR.inf<-matrix(ncol=ncol(Ttraits), nrow= nlevels(Tind_plot))
-		p.valueT_PC.PR.inf<-matrix(ncol=ncol(Ttraits), nrow= nlevels(Tind_plot))
+		p.valueT_IP.IC.inf<-matrix(ncol=ncol(Ttraits), nrow= nlevels(ind_plot))
+		p.valueT_IC.IR.inf<-matrix(ncol=ncol(Ttraits), nrow= nlevels(ind_plot))
+		p.valueT_PC.PR.inf<-matrix(ncol=ncol(Ttraits), nrow= nlevels(ind_plot))
 		
 		for (t in 1: ncol(Ttraits)){
-			for(s in 1:  nlevels(Tind_plot)){
+			for(s in 1:  nlevels(ind_plot)){
  				p.valueT_IP.IC.sup[s,t]<-sum(res$T_IP.IC[s,t]<res$T_IP.IC_nm[,t,s], na.rm=T)/(1+length(res$T_IP.IC_nm[,t,s]))
  				p.valueT_IC.IR.sup[s,t]<-sum(res$T_IC.IR[s,t]<res$T_IC.IR_nm[,t,s], na.rm=T)/(1+length(res$T_IC.IR_nm[,t,s]))
  				p.valueT_PC.PR.sup[s,t]<-sum(res$T_PC.PR[s,t]<res$T_PC.PR_nm[,t,s], na.rm=T)/(1+length(res$T_PC.PR_nm[,t,s]))
@@ -238,17 +238,17 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 		colnames(p.valueT_IC.IR.sup)<-colnames(Ttraits)
 		colnames(p.valueT_PC.PR.sup)<-colnames(Ttraits)
 		
-		rownames(p.valueT_IP.IC.sup)<-levels(Tplotsp)
-		rownames(p.valueT_IC.IR.sup)<-levels(Tplotsp)
-		rownames(p.valueT_PC.PR.sup)<-levels(Tplotsp)
+		rownames(p.valueT_IP.IC.sup)<-levels(Tplosp)
+		rownames(p.valueT_IC.IR.sup)<-levels(Tplosp)
+		rownames(p.valueT_PC.PR.sup)<-levels(Tplosp)
   	
 		colnames(p.valueT_IP.IC.inf)<-colnames(Ttraits)
 		colnames(p.valueT_IC.IR.inf)<-colnames(Ttraits)
 		colnames(p.valueT_PC.PR.inf)<-colnames(Ttraits)
 		
-		rownames(p.valueT_IP.IC.inf)<-levels(Tplotsp)
-		rownames(p.valueT_IC.IR.inf)<-levels(Tplotsp)
-		rownames(p.valueT_PC.PR.inf)<-levels(Tplotsp)
+		rownames(p.valueT_IP.IC.inf)<-levels(Tplosp)
+		rownames(p.valueT_IC.IR.inf)<-levels(Tplosp)
+		rownames(p.valueT_PC.PR.inf)<-levels(Tplosp)
 
  	}
  	else{}
@@ -273,8 +273,8 @@ Tstats<-function(Ttraits, Tind_plot, Tsp, nperm=NULL, printprogress=TRUE, p.valu
 
 
 ### Function to represent standardised effect size of Tstats using null models
-plot.ses.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("red","purple","green"), type="normal", add.conf=TRUE, ...){
-	#possible type = "color_cond", "simple", "simple_range", "normal" and "barplot"	
+plot.ses.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("red","purple","green"), type="normal", add.conf=TRUE){
+	#possible type = "color_cond", "simple", "simple_sd", "normal" and "barplot"	
 	
 	#________________________________________
 	#Calcul of standardised effect size
@@ -370,7 +370,7 @@ plot.ses.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("r
 	}
 	
 	#__________
-	else if(type=="simple_range"){
+	else if(type=="simple_sd"){
 				
 		for(t in 1:dim(tstats$T_IP.IC)[2]){
 			
@@ -465,7 +465,7 @@ plot.ses.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("r
 
 
 ### Function to represent correlations between Tstats
-plot.cor.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), add.text=FALSE, obj="traits", col.obj=NULL, plot.ask=TRUE, ...) {
+plot.cor.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), add.text=FALSE, bysites=FALSE, col.obj=NULL, plot.ask=TRUE) {
 	
 	oldpar<-par(no.readonly = TRUE)
 	par(ask=plot.ask)
@@ -496,7 +496,7 @@ plot.cor.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), add.text=FALSE,
 	cond.T_PC.PR.sup<-ses.T_PC.PR>ses.T_PC.PR.sup
 	
 	#________________________________________
-	if(obj=="traits"){
+	if(bysites==F){
 		
 		if(is.null(col.obj)) {col.obj<-rainbow(dim(tstats$T_IP.IC)[2])}
 		else{}
@@ -566,7 +566,7 @@ plot.cor.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), add.text=FALSE,
 	}
 
 	#________________________________________
-	else if(obj=="community"){
+	else if(bysites==T){
 	
 		if(is.null(col.obj)) {col.obj<-rainbow(dim(tstats$T_IP.IC)[1])}
 		else{}
@@ -641,14 +641,14 @@ plot.cor.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), add.text=FALSE,
 		}	
 	}
 	
-	else{print("Error: obj need to be either traits or community")}
+	else{print("Error: obj need to be either traits or sites")}
 	
 	par(oldpar)
 }
 
 
 ### Function to summarize traits and community which show a significative difference between observed and simulated value
-summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all", ...) {
+summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all") {
 	
 	#________________________________________
 	ses.T_IP.IC<-(tstats$T_IP.IC-apply(tstats$T_IP.IC_nm, c(3,2), function(x) mean(x, na.rm=T)))/apply(tstats$T_IP.IC_nm, c(3,2), function(x) sd(x, na.rm=T))
@@ -676,7 +676,7 @@ summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all", ...)
 	ses.T_PC.PR.sup.mean<-apply(ses.T_PC.PR.sup,2, mean)
 	
 	#________________________________________
-	#Condition to be significantly different from null models with respect to values of quantile choose
+	#Condition to be significantly different from null models with respect to values of quantile choosen
 	cond.T_IP.IC.inf<-ses.T_IP.IC<ses.T_IP.IC.inf
 	cond.T_IC.IR.inf<-ses.T_IC.IR<ses.T_IC.IR.inf
 	cond.T_PC.PR.inf<-ses.T_PC.PR<ses.T_PC.PR.inf
@@ -696,8 +696,10 @@ summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all", ...)
 	
 	#________________________________________
 	if(type=="binary"){
-	summ.Tstats <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
-	summ.Tstats <- rbind(cond.T_IP.IC.inf.mean, cond.T_IP.IC.sup.mean ,cond.T_IC.IR.inf.mean, cond.T_IC.IR.sup.mean ,cond.T_PC.PR.inf.mean, cond.T_IC.IR.sup.mean)
+		summ.Tstats <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
+		summ.Tstats <- rbind(cond.T_IP.IC.inf.mean, cond.T_IP.IC.sup.mean ,cond.T_IC.IR.inf.mean, cond.T_IC.IR.sup.mean ,cond.T_PC.PR.inf.mean, cond.T_IC.IR.sup.mean)
+		rownames(summ.Tstats) <- c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
+		colnames(summ.Tstats) <- colnames(tstats$T_IP.IC)
 	}
 	
 	#________________________________________
@@ -717,48 +719,57 @@ summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all", ...)
 		summ.Tstats[4,][cond.T_IC.IR.sup.mean]<-paste(round(colSums(cond.T_IC.IR.sup, na.rm=T)/colSums(!is.na(cond.T_IC.IR.sup)),2)[cond.T_IC.IR.sup.mean]*100, "%","*", sep="")
 		summ.Tstats[5,][cond.T_PC.PR.inf.mean]<-paste(round(colSums(cond.T_PC.PR.inf, na.rm=T)/colSums(!is.na(cond.T_PC.PR.inf)),2)[cond.T_PC.PR.inf.mean]*100, "%","*", sep="")
 		summ.Tstats[6,][cond.T_PC.PR.sup.mean]<-paste(round(colSums(cond.T_PC.PR.sup, na.rm=T)/colSums(!is.na(cond.T_PC.PR.sup)),2)[cond.T_PC.PR.sup.mean]*100, "%","*", sep="")	
+	
+		rownames(summ.Tstats) <- c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
+		colnames(summ.Tstats) <- colnames(tstats$T_IP.IC)
+
 	}
 	
 	#________________________________________
-	else if(type=="plot"){
-		
+	else if(type=="site"){
+	
 		summ.Tstats <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
 		for(t in 1: dim(cond.T_IP.IC.inf)[2]){
 			
 			if(sum(cond.T_IP.IC.inf[,t], na.rm=T)>0) 
-				{summ.Tstats[1,t]<-paste( na.exclude(rownames(cond.T_IP.IC.inf)[cond.T_IP.IC.inf[,t]]), collapse="_") }
+				{summ.Tstats[1,t]<-paste( na.exclude(rownames(cond.T_IP.IC.inf)[cond.T_IP.IC.inf[,t]]), collapse=" ") }
 			else{summ.Tstats[1,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_IP.IC.sup[,t], na.rm=T)>0) 
-				{summ.Tstats[2,t]<-paste( na.exclude(rownames(cond.T_IP.IC.sup)[cond.T_IP.IC.sup[,t]]), collapse="_")  }
+				{summ.Tstats[2,t]<-paste( na.exclude(rownames(cond.T_IP.IC.sup)[cond.T_IP.IC.sup[,t]]), collapse=" ")  }
 			else{summ.Tstats[2,t]<-"H0 not rejected"}
 								
 			if(sum(cond.T_IC.IR.inf[,t], na.rm=T)>0)
-				{summ.Tstats[3,t]<-paste( na.exclude(rownames(cond.T_IC.IR.inf)[cond.T_IP.IC.inf[,t]]), collapse="_")  }
+				{summ.Tstats[3,t]<-paste( na.exclude(rownames(cond.T_IC.IR.inf)[cond.T_IP.IC.inf[,t]]), collapse=" ")  }
 			else{summ.Tstats[3,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_IC.IR.sup[,t], na.rm=T)>0)
-				{summ.Tstats[4,t]<-paste( na.exclude(rownames(cond.T_IC.IR.sup)[cond.T_IC.IR.sup[,t]]), collapse="_")	}
+				{summ.Tstats[4,t]<-paste( na.exclude(rownames(cond.T_IC.IR.sup)[cond.T_IC.IR.sup[,t]]), collapse=" ")	}
 			else{summ.Tstats[4,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_PC.PR.inf[,t], na.rm=T)>0)
-				{summ.Tstats[5,t]<-paste( na.exclude(rownames(cond.T_PC.PR.inf)[cond.T_PC.PR.inf[,t]]), collapse="_") 	}
+				{summ.Tstats[5,t]<-paste( na.exclude(rownames(cond.T_PC.PR.inf)[cond.T_PC.PR.inf[,t]]), collapse=" ") 	}
 			else{summ.Tstats[5,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_PC.PR.sup[,t], na.rm=T)>0)
-				{summ.Tstats[6,t]<-paste( na.exclude(rownames(cond.T_PC.PR.sup)[cond.T_PC.PR.sup[,t]]), collapse="_") 	}
-			else{summ.Tstats[6,t]<-"H0 not rejected"}
+				{summ.Tstats[6,t]<-paste( na.exclude(rownames(cond.T_PC.PR.sup)[cond.T_PC.PR.sup[,t]]), collapse=" ") 	}
+			else{summ.Tstats[6,t]<-"H0 not rejected"}		
 		}
-	
+		rownames(summ.Tstats) <- c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
+		colnames(summ.Tstats) <- colnames(tstats$T_IP.IC)
+
 	}
+	
 	
 	#________________________________________
-	else if(type=="p_value"){
+	else if(type=="p.value"){
 		summ.Tstats <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
 		summ.Tstats <- rbind(tstats$pval_T_IP.IC.inf, tstats$pval_T_IP.IC.sup , tstats$pval_T_IC.IR.inf, tstats$pval_T_IC.IR.sup , tstats$pval_T_PC.PR.inf, tstats$pval_T_PC.PR.sup)
+		rownames(summ.Tstats)<-c(paste(rep("T_IP.IC.inf",dim(tstats$T_IP.IC)[1]), rownames(tstats$T_IP.IC)), paste(rep("T_IP.IC.sup",dim(tstats$T_IP.IC)[1]), rownames(tstats$T_IP.IC)), paste(rep("T_IC.IR.inf",dim(tstats$T_IP.IC)[1]), rownames(tstats$T_IP.IC)), paste(rep("T_IC.IR.sup",dim(tstats$T_IP.IC)[1]), rownames(tstats$T_IP.IC)), paste(rep("T_PC.PR.inf",dim(tstats$T_IP.IC)[1]), rownames(tstats$T_IP.IC)), paste(rep("T_PC.PR.sup",dim(tstats$T_IP.IC)[1]), rownames(tstats$T_IP.IC)))
+		colnames(summ.Tstats) <- colnames(tstats$T_IP.IC)
 	}
-
 	
+
 	#________________________________________
 	else if(type=="all"){
 		summ.Tstats<-list()
@@ -786,59 +797,52 @@ summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all", ...)
 		summ.Tstats$percent[6,][cond.T_PC.PR.sup.mean]<-paste(round(colSums(cond.T_PC.PR.sup, na.rm=T)/colSums(!is.na(cond.T_PC.PR.sup)),2)[cond.T_PC.PR.sup.mean]*100, "%","*", sep="")	
 		
 		#__________
-		##plot
-		summ.Tstats$plot <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
+		##sites
+		summ.Tstats$sites <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
 		for(t in 1: dim(cond.T_IP.IC.inf)[2]){
 			
 			if(sum(cond.T_IP.IC.inf[,t], na.rm=T)>0) 
-				{summ.Tstats$plot[1,t]<-paste( na.exclude(rownames(cond.T_IP.IC.inf)[cond.T_IP.IC.inf[,t]]), collapse="_") }
-			else{summ.Tstats$plot[1,t]<-"H0 not rejected"}
+				{summ.Tstats$sites[1,t]<-paste( na.exclude(rownames(cond.T_IP.IC.inf)[cond.T_IP.IC.inf[,t]]), collapse=" ") }
+			else{summ.Tstats$sites[1,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_IP.IC.sup[,t], na.rm=T)>0) 
-				{summ.Tstats$plot[2,t]<-paste( na.exclude(rownames(cond.T_IP.IC.sup)[cond.T_IP.IC.sup[,t]]), collapse="_")  }
-			else{summ.Tstats$plot[2,t]<-"H0 not rejected"}
+				{summ.Tstats$sites[2,t]<-paste( na.exclude(rownames(cond.T_IP.IC.sup)[cond.T_IP.IC.sup[,t]]), collapse=" ")  }
+			else{summ.Tstats$sites[2,t]<-"H0 not rejected"}
 								
 			if(sum(cond.T_IC.IR.inf[,t], na.rm=T)>0)
-				{summ.Tstats$plot[3,t]<-paste( na.exclude(rownames(cond.T_IC.IR.inf)[cond.T_IP.IC.inf[,t]]), collapse="_")  }
-			else{summ.Tstats$plot[3,t]<-"H0 not rejected"}
+				{summ.Tstats$sites[3,t]<-paste( na.exclude(rownames(cond.T_IC.IR.inf)[cond.T_IP.IC.inf[,t]]), collapse=" ")  }
+			else{summ.Tstats$sites[3,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_IC.IR.sup[,t], na.rm=T)>0)
-				{summ.Tstats$plot[4,t]<-paste( na.exclude(rownames(cond.T_IC.IR.sup)[cond.T_IC.IR.sup[,t]]), collapse="_")	}
-			else{summ.Tstats$plot[4,t]<-"H0 not rejected"}
+				{summ.Tstats$sites[4,t]<-paste( na.exclude(rownames(cond.T_IC.IR.sup)[cond.T_IC.IR.sup[,t]]), collapse=" ")	}
+			else{summ.Tstats$sites[4,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_PC.PR.inf[,t], na.rm=T)>0)
-				{summ.Tstats$plot[5,t]<-paste( na.exclude(rownames(cond.T_PC.PR.inf)[cond.T_PC.PR.inf[,t]]), collapse="_") 	}
-			else{summ.Tstats$plot[5,t]<-"H0 not rejected"}
+				{summ.Tstats$sites[5,t]<-paste( na.exclude(rownames(cond.T_PC.PR.inf)[cond.T_PC.PR.inf[,t]]), collapse=" ") 	}
+			else{summ.Tstats$sites[5,t]<-"H0 not rejected"}
 				
 			if(sum(cond.T_PC.PR.sup[,t], na.rm=T)>0)
-				{summ.Tstats$plot[6,t]<-paste( na.exclude(rownames(cond.T_PC.PR.sup)[cond.T_PC.PR.sup[,t]]), collapse="_") 	}
-			else{summ.Tstats$plot[6,t]<-"H0 not rejected"}		
+				{summ.Tstats$sites[6,t]<-paste( na.exclude(rownames(cond.T_PC.PR.sup)[cond.T_PC.PR.sup[,t]]), collapse=" ") 	}
+			else{summ.Tstats$sites[6,t]<-"H0 not rejected"}		
 		}
 		
 		#__________
 		##binary
 		summ.Tstats$binary <-matrix("H0 not rejected",nrow=6, ncol=dim(cond.T_IP.IC.inf)[2])
 		summ.Tstats$binary <- rbind(cond.T_IP.IC.inf.mean, cond.T_IP.IC.sup.mean ,cond.T_IC.IR.inf.mean, cond.T_IC.IR.sup.mean ,cond.T_PC.PR.inf.mean, cond.T_IC.IR.sup.mean)
-	}
-	
-	else{stop("Error: type must be 'binary', 'percent', 'p.value', 'plot' or 'all'.")}
-	
-	if(is.list(summ.Tstats)) {
+		
+		#__________
 		rownames(summ.Tstats$p.value)<-c(rep("T_IP.IC.inf",dim(tstats$T_IP.IC)[1]), rep("T_IP.IC.sup",dim(tstats$T_IP.IC)[1]), rep("T_IC.IR.inf",dim(tstats$T_IP.IC)[1]), rep("T_IC.IR.sup",dim(tstats$T_IP.IC)[1]), rep("T_PC.PR.inf",dim(tstats$T_IP.IC)[1]), rep("T_PC.PR.sup",dim(tstats$T_IP.IC)[1]))
 		rownames(summ.Tstats$binary)<-c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
 		rownames(summ.Tstats$percent)<-c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
-		rownames(summ.Tstats$plot)<-c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
+		rownames(summ.Tstats$sites)<-c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
+		colnames(summ.Tstats$p.value) <- colnames(tstats$T_IP.IC)
+		colnames(summ.Tstats$binary) <- colnames(tstats$T_IP.IC)
+		colnames(summ.Tstats$sites) <- colnames(tstats$T_IP.IC)
+		colnames(summ.Tstats$percent) <- colnames(tstats$T_IP.IC)
 	}
 	
-	else if( type!="p_value"){
-		rownames(summ.Tstats)<-c(rep("T_IP.IC.inf",dim(tstats$T_IP.IC)[1]), rep("T_IP.IC.sup",dim(tstats$T_IP.IC)[1]), rep("T_IC.IR.inf",dim(tstats$T_IP.IC)[1]), rep("T_IC.IR.sup",dim(tstats$T_IP.IC)[1]), rep("T_PC.PR.inf",dim(tstats$T_IP.IC)[1]), rep("T_PC.PR.sup",dim(tstats$T_IP.IC)[1]))
-	}
-	
-	else if( type=="p_value"){
-		rownames(summ.Tstats)<-c("T_IP.IC.inf", "T_IP.IC.sup", "T_IC.IR.inf", "T_IC.IR.sup", "T_PC.PR.inf", "T_PC.PR.sup")
-	}
-	
-	else{stop("Error: type must be 'binary', 'percent', 'p.value', 'plot' or 'all'.")}
+	else{stop("Error: type must be 'binary', 'percent', 'p.value', 'site' or 'all'.")}
 	
 	return(summ.Tstats)
 }
@@ -848,64 +852,64 @@ summary.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), type="all", ...)
 ### Function to calcul SES
 ses<-function(obs=NULL, nullmodel=NULL, val.quant=c(0.025,0.975) ){
 	
-	if (class(nullmodel)=="list"){
-		if (class(nullmodel[[1]])=="list"){
-			nullmodel<-array(unlist(nullmodel), dim=c(nrow(nullmodel[[1]][[1]]),ncol(nullmodel[[1]][[1]]), length(unlist(nullmodel))/nrow(nullmodel[[1]][[1]])/ncol(nullmodel[[1]][[1]])))
-		}
-		
-		else {nullmodel<-array(unlist(nullmodel), dim=c(nrow(nullmodel[[1]]),ncol(nullmodel[[1]]), length(unlist(nullmodel))/nrow(nullmodel[[1]])/ncol(nullmodel[[1]])))}
+	if(length(dim(obs))!=2 ) {
+		obs<-as.matrix(obs)
 	}
 	
-	if (class(obs)=="list"){
-		obs<-matrix(obs[[1]], nrow=nrow(obs[[1]]), ncol=ncol(obs[[1]]))
+	if(dim(obs)[1]==dim(obs)[2]) {
+		warnings("Observed matrix have the same number of rows and columns. The function is not able to detect automatically the correspondance between dimension of observed matrix and null model. You need to be sure that the null model is in the form of an array whithin the first and second dimension corresespond respectively to the first and second dimension of the observed matrix and the third dimension correspond to permutation")
+		
+		cond=c(1,2)
 	}
 	
-	if(is.null(dim(obs))) {
-		cond<-c(NA)
-		
-		if(length(obs)==dim(nullmodel)[1]){
-		cond<-1
+	else{
+	
+		if (class(nullmodel)=="list"){
+			if (class(nullmodel[[1]])=="list"){
+				nullmodel<-array(unlist(nullmodel), dim=c(nrow(nullmodel[[1]][[1]]),ncol(nullmodel[[1]][[1]]), length(unlist(nullmodel))/nrow(nullmodel[[1]][[1]])/ncol(nullmodel[[1]][[1]])))
+			}
+			
+			else {nullmodel<-array(unlist(nullmodel), dim=c(nrow(nullmodel[[1]]),ncol(nullmodel[[1]]), length(unlist(nullmodel))/nrow(nullmodel[[1]])/ncol(nullmodel[[1]])))}
 		}
 		
-		else if(length(obs)==dim(nullmodel)[2]){
-		cond<-2
+		if (class(obs)=="list"){
+			obs<-matrix(obs[[1]], nrow=nrow(obs[[1]]), ncol=ncol(obs[[1]]))
 		}
 		
-		else if(length(obs)==dim(nullmodel)[3]){
-		cond<-3
+		if(!is.null(dim(obs))) {	
+			cond<-c(NA,NA)
+			
+			if(dim(obs)[1]==dim(nullmodel)[1]){
+			cond[1]<-1
+			}
+			
+			if(dim(obs)[1]==dim(nullmodel)[2]){
+			cond[1]<-2
+			}
+			
+			if(length(dim(nullmodel))==3){
+				if(dim(obs)[1]==dim(nullmodel)[3]){
+				cond[1]<-3
+				}
+			}
+			
+			if(dim(obs)[2]==dim(nullmodel)[1]){
+			cond[2]<-1
+			}
+			
+			if(dim(obs)[2]==dim(nullmodel)[2]){
+			cond[2]<-2
+			}
+			
+			if(length(dim(nullmodel))==3){
+				if(dim(obs)[2]==dim(nullmodel)[3]){
+				cond[2]<-3
+				}	
+			}
 		}
-		
 	}
 	
-	if(!is.null(dim(obs))) {	
-		cond<-c(NA,NA)
-		
-		if(dim(obs)[1]==dim(nullmodel)[1]){
-		cond[1]<-1
-		}
-		
-		if(dim(obs)[1]==dim(nullmodel)[2]){
-		cond[1]<-2
-		}
-		
-		if(dim(obs)[1]==dim(nullmodel)[3]){
-		cond[1]<-3
-		}
-		
-		
-		if(dim(obs)[2]==dim(nullmodel)[1]){
-		cond[2]<-1
-		}
-		
-		if(dim(obs)[2]==dim(nullmodel)[2]){
-		cond[2]<-2
-		}
-		
-		if(dim(obs)[2]==dim(nullmodel)[3]){
-		cond[2]<-3
-		}
-		
-	}
+	cond<-na.omit(cond)
 	
 	res<-list()
 	res$ses<-(obs-apply(nullmodel, cond, function(x) mean(x, na.rm=T)))/apply(nullmodel, cond, function(x) sd(x, na.rm=T))
@@ -918,7 +922,7 @@ ses<-function(obs=NULL, nullmodel=NULL, val.quant=c(0.025,0.975) ){
 
 
 ### Function to represent summarize Tstats
-plot.bar.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("red","purple","green","white"), ...){
+plot.bar.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("red","purple","green","white")){
     
   T_IP.IC.inf<-apply(tstats$T_IP.IC_nm, c(3,2), function(x) quantile(x, na.rm=T, prob=val.quant[1]))
   T_IC.IR.inf<-apply(tstats$T_IC.IR_nm, c(3,2), function(x) quantile(x, na.rm=T, prob=val.quant[1]))
@@ -945,8 +949,8 @@ plot.bar.Tstats<-function(tstats=NULL, val.quant=c(0.025,0.975), col.Tstats=c("r
 }
 
 
-#~ if byplot=F, plot this function by traits
-plot.filter<-function(index.list, color.cond=NULL, val.quant=c(0.025,0.975), cex.text =0.8, plot.ask=TRUE, srt.text=90, xlim=NULL, ylim=NULL, byplot=T, ...){
+#~ if bysites=F, plot this function by traits
+plot.filter<-function(index.list, color.cond=NULL, val.quant=c(0.025,0.975), cex.text =0.8, plot.ask=TRUE, srt.text=90, xlim=NULL, ylim=NULL, bysites=T){
 		
 	namesindex.all<-names(index.list)
 	nindex<-length(names(index.list))/2
@@ -963,12 +967,12 @@ plot.filter<-function(index.list, color.cond=NULL, val.quant=c(0.025,0.975), cex
 	
 	#________________________________________
 	#Calcul of standardised effect size
-	
+		
 	res<-list()
 	for (i in seq(1,nindex*2, by=2)){
-		if (dim(index.list[[i]])[1] != dim(index.list[[1]])[1] ) {index.list[[i]]<-t(index.list[[i]])}
-		res[[eval(namesindex.all[i])]] <- ses(obs=index.list[i], nullmodel=index.list[i+1], val.quant=val.quant)
+		res[[eval(namesindex.all[i])]] <- ses(obs=index.list[[i]], nullmodel=index.list[[i+1]], val.quant=val.quant)
 	}
+
 		
 	if(is.null(ylim)){ ylim=c(0.5,nindex+0.5)}
 	if(is.null(xlim)){ xlim=c(min(c(-2,unlist(res)), na.rm=T),max(c(2,unlist(res)), na.rm=T))}
@@ -977,7 +981,7 @@ plot.filter<-function(index.list, color.cond=NULL, val.quant=c(0.025,0.975), cex
 	
 	if(is.null(color.cond)) {color.cond=c("blue","orange")}
 		
-	if(byplot==T){
+	if(bysites==T){
 		for (s in 1: ncom){
 			plot(mean(res[[eval(namesindex.all[i])]]$ses[s,], na.rm=T), (1:nindex)[i] ,bty="n", cex.lab=0.8, yaxt="n", xlab=paste("SES", namesplots[s]), ylim=ylim, xlim=xlim, pch=16, type="n")
 			abline(v=0)	
@@ -1011,7 +1015,7 @@ plot.filter<-function(index.list, color.cond=NULL, val.quant=c(0.025,0.975), cex
 	}
 	
 	
-	else if(byplot==F){
+	else if(bysites==F){
 		for (t in 1: ntr){
 			plot(mean(res[[eval(namesindex.all[i])]]$ses[,t], na.rm=T), (1:nindex)[i] ,bty="n", cex.lab=0.8, yaxt="n", xlab=paste("SES", namestraits[t]), ylim=ylim, xlim=xlim, pch=16, type="n")
 			abline(v=0)	
@@ -1050,33 +1054,33 @@ plot.filter<-function(index.list, color.cond=NULL, val.quant=c(0.025,0.975), cex
 
 
 
-plot.filter.c<-function(com.object.ind=NULL, com.object.sp=NULL, tstats=NULL, color.cond=NULL, val.quant=c(0.025, 0.975), xlim=NULL, ylim=NULL, byplot=TRUE, cex.text =0.8, plot.ask=TRUE, srt.text=90,...){
+plot.filter.c<-function(com.object.ind=NULL, com.object.sp=NULL, tstats=NULL, color.cond=NULL, val.quant=c(0.025, 0.975), xlim=NULL, ylim=NULL, bysites=TRUE, cex.text =0.8, plot.ask=TRUE, srt.text=90){
   	
 	
 	index.list.internal.ind<-list(T_IP.IC=tstats$T_IP.IC, T_IP.IC_nm=tstats$T_IP.IC_nm, 
-							  CV.ind=com.object.ind$CV.NND_obs, CV.ind.null=com.object.ind$Null_CV,
-							  kurtosis.ind=com.object.ind$kurtosis_obs, kurtosis.ind.null=com.object.ind$Null_kurtosis)
+							  CV.ind=t(com.object.ind$CV.NND_obs), CV.ind.null=com.object.ind$Null_CV,
+							  kurtosis.ind=t(com.object.ind$kurtosis_obs), kurtosis.ind.null=com.object.ind$Null_kurtosis)
 
 	
-	index.list.internal.sp<-list(CV.sp=com.object.sp$CV.NND_obs, CV.sp.null=com.object.sp$Null_CV,
-							  kurtosis.sp=com.object.sp$kurtosis_obs, kurtosis.sp.null=com.object.sp$Null_kurtosis)
+	index.list.internal.sp<-list(CV.sp=t(com.object.sp$CV.NND_obs), CV.sp.null=com.object.sp$Null_CV,
+							  kurtosis.sp=t(com.object.sp$kurtosis_obs), kurtosis.sp.null=com.object.sp$Null_kurtosis)
 
 	rownames(tstats$T_IC.IR)<-rownames(tstats$T_IP.IC)
 	index.list.external.ind<-list(T_IC.IR=tstats$T_IC.IR, T_IC.IR_nm=tstats$T_IC.IR_nm, 
-								  range.ind=com.object.ind$Range_obs, range.ind.null=com.object.ind$Null_range,
-								  mean.ind=com.object.ind$Mean_obs, mean.ind.null=com.object.ind$Null_mean)
+								  range.ind=t(com.object.ind$Range_obs), range.ind.null=com.object.ind$Null_range,
+								  mean.ind=t(com.object.ind$Mean_obs), mean.ind.null=com.object.ind$Null_mean)
 	
 	rownames(tstats$T_PC.PR)<-rownames(tstats$T_IP.IC)
 	index.list.external.sp<-list(T_PC.PR=tstats$T_PC.PR, T_PC.PR_nm=tstats$T_PC.PR_nm,
-								  range.sp=com.object.sp$Range_obs, range.sp.null=com.object.sp$Null_range,
-								  mean.sp=com.object.sp$Mean_obs, mean.sp.null=com.object.sp$Null_mean)
+								  range.sp=t(com.object.sp$Range_obs), range.sp.null=com.object.sp$Null_range,
+								  mean.sp=t(com.object.sp$Mean_obs), mean.sp.null=com.object.sp$Null_mean)
 
     par(mfrow=c(2,2))
                  
-	plot.filter(index.list.internal.ind, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, byplot=byplot)
-	plot.filter(index.list.internal.sp, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, byplot=byplot)
-	plot.filter(index.list.external.ind, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, byplot=byplot)
-	plot.filter(index.list.external.sp, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, byplot=byplot)
+	plot.filter(index.list.internal.ind, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, bysites=bysites)
+	plot.filter(index.list.internal.sp, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, bysites=bysites)
+	plot.filter(index.list.external.ind, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, bysites=bysites)
+	plot.filter(index.list.external.sp, color.cond=color.cond, val.quant=val.quant, cex.text =cex.text, plot.ask=plot.ask, srt.text=srt.text, xlim=xlim, ylim=ylim, bysites=bysites)
 
 	
     par(mfrow=c(1,1))
@@ -1109,10 +1113,10 @@ plot.ses.var<-function(index.list, variable=NULL, color.traits=NULL, val.quant=c
 	
 	res<-list()
 	for (i in seq(1,nindex*2, by=2)){
-		res[[eval(namesindex.all[i])]] <- ses(obs=index.list[i], nullmodel=index.list[i+1], val.quant=val.quant)
+		res[[eval(namesindex.all[i])]] <- ses(obs=index.list[[i]], nullmodel=index.list[[i+1]], val.quant=val.quant)
 	}
 
-
+	old.par<-par()
 	par(mfrow=c(ceiling(sqrt(nindex))-1, ceiling(sqrt(nindex))))
 	
 	ylim=c(min(y, na.rm=T), max(y, na.rm=T))
@@ -1146,6 +1150,8 @@ plot.ses.var<-function(index.list, variable=NULL, color.traits=NULL, val.quant=c
 		plot(0, 0 ,bty="n", cex.lab=0.8, xlab=paste("SES", namesindex.all[i]), ylim=ylim, xlim=xlim, pch=16, type="n")
 		legend("center", legend=namestraits, fill=color.traits, bty="n", ncol= round(sqrt(nlevels(as.factor(namestraits)))-1 ) )
 	}
+	
+	par(old.par)
 	
 }
 

@@ -25,30 +25,29 @@ CVNND<-function(trait, div_range=FALSE){
 #Proba can be use to take into account for abundance (c.f. com.i et al. 2010)
 #if pop.aggregate=FALSE, ?????
 
-com.index.c<-function(traits=NULL, ind.plot=NULL, comm=NULL, name_sp_plot=NULL, proba=NULL,nperm=99, quantile=c(0.025,0.975), pop.aggregate=TRUE, printprogress=TRUE, ...){
+com.index.c<-function(traits=NULL, ind.plot=NULL, sp=NULL, proba=NULL,nperm=99, val.quant=c(0.025,0.975), printprogress=TRUE, pop.aggregate=TRUE){
 	
-	if(is.null(comm) & !is.null(ind.plot)){
-		comm<-t(table(ind.plot,1:length(ind.plot)))
-	}
-	
-	library(e1071) #for the function kurtosis
-	
+	name_sp_sites=paste(sp, ind.plot,sep="_")
+	comm=NULL
+	comm<-t(table(ind.plot,1:length(ind.plot)))
+		
 	if(is.null(proba) & pop.aggregate==FALSE)
 		{proba=rep(1, times=dim(traits)[1])}  
 	else {}
 	
 	if(is.null(proba) & pop.aggregate==TRUE) 
-		{proba=rep(1, times=length(unique(name_sp_plot)))}  
+		{proba=rep(1, times=length(unique(name_sp_sites)))}  
 	else {}
 	
 	S = colSums(comm>0)
+
 	
 	######################################### 
 	#### 	  Calcul on null models  	 ####
 	######################################### 
 	if(pop.aggregate==T) {
-			traits<-apply(traits, 2 , function (x) tapply(x, name_sp_plot, mean , na.rm=T))
-			S<- table(unlist(strsplit(levels(as.factor(name_sp_plot)),split="_"))[3*(1:nlevels(as.factor(name_sp_plot)))])
+			traits<-apply(traits, 2 , function (x) tapply(x, name_sp_sites, mean , na.rm=T))
+			S<- table(unlist(strsplit(levels(as.factor(name_sp_sites)),split="_"))[3*(1:nlevels(as.factor(name_sp_sites)))])
 	}
 		
 	if(is.numeric(nperm)){
@@ -106,23 +105,23 @@ com.index.c<-function(traits=NULL, ind.plot=NULL, comm=NULL, name_sp_plot=NULL, 
 			
 			Range_Mean[t,]<-apply(Null_range[[t]],2,mean)
 			Range_sd[t,]<-apply(Null_range[[t]],2,sd)
-			Range_qsup[t,]<-apply(Null_range[[t]],2,function(x) quantile(x, prob=quantile[2], na.rm=T))
-			Range_qinf[t,]<-apply(Null_range[[t]],2,function(x) quantile(x, prob=quantile[1], na.rm=T))
+			Range_qsup[t,]<-apply(Null_range[[t]],2,function(x) quantile(x, prob=val.quant[2], na.rm=T))
+			Range_qinf[t,]<-apply(Null_range[[t]],2,function(x) quantile(x, prob=val.quant[1], na.rm=T))
 			#__________
 			Mean_Mean[t,]<-apply(Null_mean[[t]],2,mean)
 			Mean_sd[t,]<-apply(Null_mean[[t]],2,sd)
-			Mean_qsup[t,]<-apply(Null_mean[[t]],2,function(x) quantile(x, prob=quantile[2], na.rm=T))
-			Mean_qinf[t,]<-apply(Null_mean[[t]],2,function(x) quantile(x, prob=quantile[1], na.rm=T))
+			Mean_qsup[t,]<-apply(Null_mean[[t]],2,function(x) quantile(x, prob=val.quant[2], na.rm=T))
+			Mean_qinf[t,]<-apply(Null_mean[[t]],2,function(x) quantile(x, prob=val.quant[1], na.rm=T))
 			#__________
 			CV.NND_Mean[t,]<-apply(Null_CV[[t]],2,mean)
 			CV.NND_sd[t,]<-apply(Null_CV[[t]],2,sd)
-			CV.NND_qsup[t,]<-apply(Null_CV[[t]],2,function(x) quantile(x, prob=quantile[2], na.rm=T))
-			CV.NND_qinf[t,]<-apply(Null_CV[[t]],2,function(x) quantile(x, prob=quantile[1], na.rm=T))
+			CV.NND_qsup[t,]<-apply(Null_CV[[t]],2,function(x) quantile(x, prob=val.quant[2], na.rm=T))
+			CV.NND_qinf[t,]<-apply(Null_CV[[t]],2,function(x) quantile(x, prob=val.quant[1], na.rm=T))
 			#__________
 			kurtosis_Mean[t,]<-apply(Null_kurtosis[[t]],2,mean)
 			kurtosis_sd[t,]<-apply(Null_kurtosis[[t]],2,sd)
-			kurtosis_qsup[t,]<-apply(Null_kurtosis[[t]],2,function(x) quantile(x, prob=quantile[2], na.rm=T))
-			kurtosis_qinf[t,]<-apply(Null_kurtosis[[t]],2,function(x) quantile(x, prob=quantile[1], na.rm=T))
+			kurtosis_qsup[t,]<-apply(Null_kurtosis[[t]],2,function(x) quantile(x, prob=val.quant[2], na.rm=T))
+			kurtosis_qinf[t,]<-apply(Null_kurtosis[[t]],2,function(x) quantile(x, prob=val.quant[1], na.rm=T))
 			
 			if(printprogress==T){print(paste(round(t/dim(traits)[2]*100, 2), "%", sep=" "))} else {} 
 		} 
@@ -144,7 +143,7 @@ com.index.c<-function(traits=NULL, ind.plot=NULL, comm=NULL, name_sp_plot=NULL, 
 	if(pop.aggregate==T) 
 		{interm<-lapply(strsplit(paste(rownames(traits), sep="_"), split="_"), function(x) x[3])}
 	else if(pop.aggregate==F)
-		{interm<-lapply(strsplit(paste(name_sp_plot, sep="_"), split="_"), function(x) x[3])}
+		{interm<-lapply(strsplit(paste(name_sp_sites, sep="_"), split="_"), function(x) x[3])}
 	else {print("Error: pop.aggregate must be TRUE or FALSE")}
 			
 	# Range
@@ -205,20 +204,20 @@ com.index.c<-function(traits=NULL, ind.plot=NULL, comm=NULL, name_sp_plot=NULL, 
 		
 	}
 	
-	com.i$plots_richness<-S
-	com.i$nametraits<-colnames(traits)
+	com.i$sites_richness<-S
+	com.i$namestraits<-colnames(traits)
 	
 	return(com.i)
 }
 
 
-plot.com<-function(com.object=NULL, nametraits=NULL, plot.labels=NULL, plot.ask=TRUE, ord=NULL, ...){
+plot.com<-function(com.object=NULL, namestraits=NULL, sites_names=NULL, plot.ask=TRUE, ord=NULL){
 	
 	com.i<-com.object
-	nametraits=com.i$nametraits		
+	namestraits=com.i$namestraits		
 	
-	if(is.null(plot.labels)) 
-		{plot.labels=colnames(com.i$Null_mean[[1]])} 
+	if(is.null(sites_names)) 
+		{sites_names=colnames(com.i$Null_mean[[1]])} 
 	else{}
 	
 	oldpar<-par(no.readonly = TRUE)
@@ -228,35 +227,35 @@ plot.com<-function(com.object=NULL, nametraits=NULL, plot.labels=NULL, plot.ask=
 	par(mar=c(2,4,1,2))
 	
 	if (is.null(ord))
-		{ord<-order(plot.labels)}
+		{ord<-order(sites_names)}
 	else{}	
 	
-	for(t in 1:length(nametraits)) {
+	for(t in 1:length(namestraits)) {
 
 		yli=c(min(((com.i$Range_obs[t,]-com.i$Range_Mean[t])/com.i$Range_sd[t])[ord], 0, na.rm=T)-3, max(((com.i$Range_obs[t,]-com.i$Range_Mean[t])/com.i$Range_sd[t])[ord], 0, na.rm=T)+3)
-		plot(((com.i$Range_obs[t,]-com.i$Range_Mean[t])/com.i$Range_sd[t])[ord], bty="n", xaxt="n", pch=16, ylim=yli, main=nametraits[t] ,ylab="SES Range", xlab=NA)
-		text(0.5+((com.i$Range_obs[t,]-com.i$Range_Mean[t])/com.i$Range_sd[t])[ord], labels=plot.labels[ord])
+		plot(((com.i$Range_obs[t,]-com.i$Range_Mean[t])/com.i$Range_sd[t])[ord], bty="n", xaxt="n", pch=16, ylim=yli, main=namestraits[t] ,ylab="SES Range", xlab=NA)
+		text(0.5+((com.i$Range_obs[t,]-com.i$Range_Mean[t])/com.i$Range_sd[t])[ord], labels=sites_names[ord])
 		abline(h=0, lty=1)
 		lines(((com.i$Range_qsup[t,] -com.i$Range_Mean[t])/com.i$Range_sd[t])[ord] , lty=2)
 		lines(((com.i$Range_qinf[t,] -com.i$Range_Mean[t])/com.i$Range_sd[t])[ord] , lty=2)
 
 		yli=c(min(((com.i$Mean_obs[t,]-com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord], 0, na.rm=T)-3, max(((com.i$Mean_obs[t,]-com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord], 0, na.rm=T)+3)
-		plot(((com.i$Mean_obs[t,]-com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord], bty="n", xaxt="n", pch=16, main=nametraits[t], ylim=yli, ylab="SES Mean", xlab=NA)
-		text(0.5+((com.i$Mean_obs[t,]-com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord], labels=plot.labels[ord])
+		plot(((com.i$Mean_obs[t,]-com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord], bty="n", xaxt="n", pch=16, main=namestraits[t], ylim=yli, ylab="SES Mean", xlab=NA)
+		text(0.5+((com.i$Mean_obs[t,]-com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord], labels=sites_names[ord])
 		abline(h=0, lty=1)
 		lines(((com.i$Mean_qsup[t,] -com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord] , lty=2)
 		lines(((com.i$Mean_qinf[t,] -com.i$Mean_Mean[t])/com.i$Mean_sd[t])[ord] , lty=2)
 
 		yli=c(min(((com.i$CV.NND_obs[t,]-com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord], 0, na.rm=T)-3, max(((com.i$CV.NND_obs[t,]-com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord], 0, na.rm=T)+3)
-		plot(((com.i$CV.NND_obs[t,]-com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord], bty="n", xaxt="n", pch=16, main=nametraits[t], ylim=yli, ylab="SES CV_NND", xlab=NA)
-		text(0.5+((com.i$CV.NND_obs[t,]-com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord], labels=plot.labels[ord])
+		plot(((com.i$CV.NND_obs[t,]-com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord], bty="n", xaxt="n", pch=16, main=namestraits[t], ylim=yli, ylab="SES CV_NND", xlab=NA)
+		text(0.5+((com.i$CV.NND_obs[t,]-com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord], labels=sites_names[ord])
 		abline(h=0, lty=1)
 		lines(((com.i$CV.NND_qsup[t,] -com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord] , lty=2)
 		lines(((com.i$CV.NND_qinf[t,] -com.i$CV.NND_Mean[t])/com.i$CV.NND_sd[t])[ord] , lty=2)
 
 		yli=c(min(((com.i$kurtosis_obs[t,]-com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord], 0, na.rm=T)-3, max(((com.i$kurtosis_obs[t,]-com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord], 0, na.rm=T)+3)
-		plot(((com.i$kurtosis_obs[t,]-com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord], bty="n", xaxt="n", main=nametraits[t], pch=16, ylim=yli, ylab="SES kurtosis", xlab=NA)
-		text(0.5+((com.i$kurtosis_obs[t,]-com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord],labels=plot.labels[ord])
+		plot(((com.i$kurtosis_obs[t,]-com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord], bty="n", xaxt="n", main=namestraits[t], pch=16, ylim=yli, ylab="SES kurtosis", xlab=NA)
+		text(0.5+((com.i$kurtosis_obs[t,]-com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord],labels=sites_names[ord])
 		abline(h=0, lty=1)
 		lines(((com.i$kurtosis_qsup[t,] -com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord] , lty=2)
 		lines(((com.i$kurtosis_qinf[t,] -com.i$kurtosis_Mean[t])/com.i$kurtosis_sd[t])[ord] , lty=2)
@@ -267,7 +266,7 @@ par(oldpar)
 }
 
 
-mat.comm<-function(com.object=NULL, tstats=NULL,  val.quant=c(0.025,0.975), plot_names=NULL, method="p.val",...) {
+mat.comm<-function(com.object=NULL, tstats=NULL,  val.quant=c(0.025,0.975), sites_names=NULL, method="p.val") {
 	
 	val.quanti<-val.quant
 	
@@ -280,15 +279,15 @@ mat.comm<-function(com.object=NULL, tstats=NULL,  val.quant=c(0.025,0.975), plot
 	else {stop("Both com.i.object and tstats are NULL")}
 	
 	if( nindex==7 | nindex==4 ) 
-		{nplots<- length(com.i$plots_richness)}
+		{nplots<- length(com.i$sites_richness)}
 	
 	else{nplots<- dim(tstats$T_IP.IC)[1]}
 	
-	if(is.null(plot_names) & nindex==4)
-		{plot_names<-as.factor(1:length(com.i$plots_richness))}
+	if(is.null(sites_names) & nindex==4)
+		{sites_names<-as.factor(1:length(com.i$sites_richness))}
 	 
-	else if (is.null(plot_names))
-		{plot_names<-as.factor(1:dim(tstats$T_IP.IC)[1])}	
+	else if (is.null(sites_names))
+		{sites_names<-as.factor(1:dim(tstats$T_IP.IC)[1])}	
 		
 	
 	if(nindex==7){
@@ -491,7 +490,7 @@ mat.comm<-function(com.object=NULL, tstats=NULL,  val.quant=c(0.025,0.975), plot
 		
 		for (t in 1: ntr){
 			for (s in 1:nplots){
-				if(nindex==7 | nindex==4){
+				if(nindex==7){
 					mat_ass_com[s,t]<-ses.range$ses[t,s]
 					mat_ass_com[s+nplots,t]<-ses.mean$ses[t,s]
 					mat_ass_com[s+2*nplots,t]<-ses.CV$ses[t,s]
@@ -522,16 +521,16 @@ mat.comm<-function(com.object=NULL, tstats=NULL,  val.quant=c(0.025,0.975), plot
 	
 	if(!is.null(tstats)) 
 		{colnames(mat_ass_com)<- colnames(tstats$T_IP.IC)}
-	else {colnames(mat_ass_com)<- colnames(com.i$nametraits)}
+	else {colnames(mat_ass_com)<- colnames(com.i$namestraits)}
 
 	if(nindex==4)
-		{rownames(mat_ass_com)<-c(paste(unique(plot_names),"range", sep=" "), paste(unique(plot_names),"mean", sep=" "), paste(unique(plot_names),"CV_NND", sep=" "), paste(unique(plot_names),"kurtosis", sep=" "))}
+		{rownames(mat_ass_com)<-c(paste(unique(sites_names),"range", sep=" "), paste(unique(sites_names),"mean", sep=" "), paste(unique(sites_names),"CV_NND", sep=" "), paste(unique(sites_names),"kurtosis", sep=" "))}
 	
 	else if(nindex==3)
-		{rownames(mat_ass_com)<-c(paste(unique(plot_names),"T_IP.IC", sep=" "), paste(unique(plot_names),"T_IC.IR", sep=" "), paste(unique(plot_names),"T_PC.PR", sep=" "))}
+		{rownames(mat_ass_com)<-c(paste(unique(sites_names),"T_IP.IC", sep=" "), paste(unique(sites_names),"T_IC.IR", sep=" "), paste(unique(sites_names),"T_PC.PR", sep=" "))}
 	
 	else if(nindex==7)
-	{rownames(mat_ass_com)<-c(paste(unique(plot_names),"range", sep=" "), paste(unique(plot_names),"mean", sep=" "), paste(unique(plot_names),"CV_NND", sep=" "), paste(unique(plot_names),"kurtosis", sep=" "), paste(unique(plot_names),"T_IP.IC", sep=" "), paste(unique(plot_names),"T_IC.IR", sep=" "), paste(unique(plot_names),"T_PC.PR", sep=" "))}
+	{rownames(mat_ass_com)<-c(paste(unique(sites_names),"range", sep=" "), paste(unique(sites_names),"mean", sep=" "), paste(unique(sites_names),"CV_NND", sep=" "), paste(unique(sites_names),"kurtosis", sep=" "), paste(unique(sites_names),"T_IP.IC", sep=" "), paste(unique(sites_names),"T_IC.IR", sep=" "), paste(unique(sites_names),"T_PC.PR", sep=" "))}
 	
 	else{}
 	
@@ -542,60 +541,6 @@ return(mat_ass_com)
 
 }
 
-
-plot.mat.comm<-function(mat_comm=NULL, nindex=NULL, color.plot=NULL, summarize=FALSE, Circles=F, ...){
-	
-	library(bipartite)
-	
-	if(nindex!=3 & nindex!=4 & nindex!=7)
-		{stop("nindex must be 3 (for Tstats), 4 (for comm.com.i) or 7 (both Tstats and comm.com.i index)")}
-
-	if(summarize==FALSE) {
-	n.value<-length(unique(as.factor(mat_comm)))
-	
-		if(length(color.plot)!=n.value) {
-			if(n.value<=3)
-				{color.plot<-rev(c(rgb(230, 97, 1,200,max = 255), rgb(200, 200, 200,200,max = 255), rgb(94, 60, 153,200,max = 255)))}
-			else if(n.value>3)
-				{color.plot<-rev(c(rgb(230, 97, 1,200,max = 255), rgb(253, 184, 99,255,max = 255), rgb(200, 200, 200,200,max = 255), rgb(178, 171, 210,255,max = 255), rgb(94, 60, 153,200,max = 255)))}
-			else{color.plot<-c(heat.colors(length(unique(mat_comm)>0)),"white",cm.colors(length(unique(mat_comm)<0)))}
-		}
-		
-		visweb(mat_comm, type="none", clear=F, def.col=color.plot, square="d", circles=Circles, outerbox.col=color.plot[2] ,circle.col=color.plot[-2])
-	}
-	
-	else if(summarize==T){
-	
-		nplots=dim(mat_comm)[1]/nindex
-		fact<-sort(rep((1:nindex),nplots))
-		
-		mat_comm_sum<-matrix(nrow=nindex, ncol=dim(mat_comm)[2])
-		colnames(mat_comm_sum)<-colnames(mat_comm)
-		rownames(mat_comm_sum)<-unlist(strsplit(rownames(mat_comm), split=" ") [nplots*1:nindex] ) [seq(2, 2*nindex, by=2)]
-
-		
-		for (s in 1:nindex){
-			mat_comm_sum[s,]<-apply(mat_comm[fact==s,], 2, sum)
-		}
-		
-		
-		n.value<-length(unique(as.factor(mat_comm_sum)))
-	
-		if(length(color.plot)!=n.value) {
-			color.plot<-heat.colors(n.value)
-		}
-		
-		visweb(mat_comm_sum, type="none", clear=F, def.col=color.plot, square="d", circles=Circles, outerbox.col=color.plot[2] ,circle.col=color.plot[-2])
-
-	}
-	
-	else (stop("summarize must be logical"))	
-
-}
-
-
-
-
 ### Function to represent standardised effect size of all indices using null models
 # index.list is a list of index associate with a list of corresponding null models in this order: [1] index 1 obs - [2] index 1 null model - [3] index 2 obs - [4] index 2 null model ...
 #e.g. index.list<-list(T_IP.IC=res.finch$T_IP.IC, T_IP.IC_nm=res.finch$T_IP.IC_nm, T_PC.PR=res.finch$T_PC.PR, T_PC.PR_nm=res.finch$T_PC.PR_nm)
@@ -603,7 +548,7 @@ plot.mat.comm<-function(mat_comm=NULL, nindex=NULL, color.plot=NULL, summarize=F
 
 #You can transpose the observed matrix to represent either the ses by traits or by plots
 
-plot.ses<-function(index.list, col.index=c("red","purple","green"), type="normal", add.conf=TRUE, color.cond=TRUE, val.quant=c(0.025,0.975), grid.v=TRUE, grid.h=TRUE, xlim=NULL, ylim=NULL,...){
+plot.ses<-function(index.list, col.index=c("red","purple","green"), type="normal", add.conf=TRUE, color.cond=TRUE, val.quant=c(0.025,0.975), grid.v=TRUE, grid.h=TRUE, xlim=NULL, ylim=NULL){
 	#possible type = "simple",  "simple_range", "normal" and "barplot"	
 	
 	namesindex.all<-names(index.list)
@@ -625,7 +570,7 @@ plot.ses<-function(index.list, col.index=c("red","purple","green"), type="normal
 	
 	res<-list()
 	for (i in seq(1,nindex*2, by=2)){
-		res[[eval(namesindex.all[i])]] <- ses(obs=index.list[i], nullmodel=index.list[i+1], val.quant=val.quant)
+		res[[eval(namesindex.all[i])]] <- ses(obs=index.list[[i]], nullmodel=index.list[[i+1]], val.quant=val.quant)
 	}
 	
 	if(is.null(ylim)) { ylim=c(0,5.5+(nindex+1)*ntr)}
@@ -782,7 +727,7 @@ plot.ses<-function(index.list, col.index=c("red","purple","green"), type="normal
 	}
 	else{print(paste("Error:",type,"is not a valid type of plot"))}
 	
-	legend("bottom", inset=.005, namesindex, fill=col.index, ncol=nindex/3 ,cex=0.6, bty="0")
+	legend("bottom", inset=.005, namesindex, fill=col.index, ncol=round(nindex/3) ,cex=0.6, bty="0")
 
 	par(mar=c(5, 4, 4, 2) + 0.1) #return to default parameter
 }
@@ -790,39 +735,36 @@ plot.ses<-function(index.list, col.index=c("red","purple","green"), type="normal
 
 
 
-
 #Calcul of statistics (e.g. mean, range, CVNND and kurtosis) to test community assembly using null models
 #For each statistic this function return observed value and correspondant Null distribution
-#This function implement three null models which keep the number of individual per community
+#This function implement three null models which keep unchanged the number of individual per community
 #Models 1 correspond to randomization of individual values whithin community
 #Models 2 correspond to randomization of individual values whithin region
 #Models 3 correspond to randomization of population values whithin region
 
-#In most case, model 1 and 2 correspond to index at the levels species and the model 3 to index at the species (or any other aggregate variable like genus or family) level
+#In most case, model 1 and 2 correspond to index at the individual level and the model 3 to index at the species (or any other aggregate variable like genus or family) level
 
 
-com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, obs.level=NULL, ind_plot=NULL, sp=NULL, nperm=99, quantile=c(0.025,0.975), pop.aggregate=TRUE, printprogress=TRUE, ...){
+com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, ind.plot=NULL, sp=NULL, nperm=99, printprogress=TRUE){
 	
 	nindex<-length(index)
 	
 	if(is.null(namesindex)) {  namesindex<-index }
 	ntr<-dim(traits)[2]
 	namestraits<-colnames(traits)
-		
-	name_sp_plot=paste(ind_plot,sp,sep="_")
+	
+	traits<-traits[order(ind.plot),]
+	ind.plot<-ind.plot[order(ind.plot)]
+	sp<-sp[order(ind.plot)]
+	
+	name_sp_sites=paste(sp, ind.plot, sep="_")
 	comm=NULL
-	comm<-t(table(ind_plot,1:length(ind_plot)))
+	comm<-t(table(ind.plot,1:length(ind.plot)))
 	
 	S = colSums(comm>0)
 	ncom=length(S)
 	
-	
-	if(is.null(obs.level)){
-		obs.level<-nullmodels
-	}
-	
-	
-	if(!is.null(nperm)){
+	if(is.numeric(nperm)){
 		######################################### 
 		#### 	  Calcul of null models  	 ####
 		######################################### 
@@ -836,13 +778,15 @@ com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, o
 			traits.nm1<-list()
 			
 			for (t in 1: ntr){	
-				traits.nm1[[eval(namestraits[t])]]<-array(NA, dim=c(ncom, nperm, max(S)))
-				for(s in 1:  ncom) {
-					
-					for(n in 1:nperm){
-						perm_ind_plot<-sample(traits[ind_plot==levels(ind_plot)[s], t], table(ind_plot)[s])
-						traits.nm1[[eval(namestraits[t])]][s,n,1:length(perm_ind_plot)]<-perm_ind_plot
+				traits.nm1[[eval(namestraits[t])]]<-matrix(NA, nrow=dim(traits)[1], ncol=nperm)
+				perm_ind.plot<-list()
+				
+				for(n in 1:nperm){
+					for(s in 1:  ncom) {
+						perm_ind.plot[[s]]<-sample(traits[ind.plot==levels(ind.plot)[s], t], table(ind.plot)[s])
 					}
+					
+					traits.nm1[[eval(namestraits[t])]][,n]<-unlist(perm_ind.plot)
 				} 
 				if(printprogress==T){
 					print(paste("nm.1",round(t/ntr*100,2),"%")) 
@@ -857,13 +801,15 @@ com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, o
 			traits.nm2<-list()
 			
 			for (t in 1: ntr){	
-				traits.nm2[[eval(namestraits[t])]]<-array(NA, dim=c(ncom, nperm, max(S)))
-				for(s in 1:  ncom) {
-					
-					for(n in 1:nperm){
-						perm_ind_plot<-sample(traits[, t], table(ind_plot)[s])
-						traits.nm2[[eval(namestraits[t])]][s,n,1:length(perm_ind_plot)]<-perm_ind_plot	
+				traits.nm2[[eval(namestraits[t])]]<-matrix(NA, nrow=dim(traits)[1], ncol=nperm)
+				perm_ind.plot<-list()
+				
+				for(n in 1:nperm){
+					for(s in 1:  ncom) {
+						perm_ind.plot[[s]]<-sample(traits[, t], table(ind.plot)[s])
 					}
+					
+					traits.nm2[[eval(namestraits[t])]][,n]<-unlist(perm_ind.plot)
 				} 
 				if(printprogress==T){
 					print(paste("nm.2",round(t/ntr*100,2),"%")) 
@@ -876,18 +822,20 @@ com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, o
 			#________________________________________  
 			#modèle nul 3: permutation des espèces au niveau de la région   
 			traits.nm3<-list()
-			traits_by_sp<-apply(traits,2,function(x) tapply(x,name_sp_plot,mean))  
-			traits_by_pop<-traits_by_sp[match(name_sp_plot,rownames(traits_by_sp)),]
+			traits_by_sp<-apply(traits,2,function(x) tapply(x,name_sp_sites,mean, na.rm=T))  
+			traits_by_pop<-traits_by_sp[match(name_sp_sites,rownames(traits_by_sp)),]
 			
 			for (t in 1: ntr){	
-				traits.nm3[[eval(namestraits[t])]]<-array(NA, dim=c(ncom, nperm, max(S)))
-				for(s in 1:  ncom) {
-					
-					for(n in 1:nperm){
-						perm_ind_plot<-sample(traits_by_pop, table(ind_plot)[s])
-						traits.nm3[[eval(namestraits[t])]][s,n,1:length(perm_ind_plot)]<-perm_ind_plot	
+				traits.nm3[[eval(namestraits[t])]]<-matrix(NA, nrow=dim(traits)[1], ncol=nperm)
+				perm_ind.plot<-list()
+				
+				for(n in 1:nperm){
+					for(s in 1:  ncom) {
+						perm_ind.plot[[s]]<-sample(traits_by_pop, table(ind.plot)[s])
 					}
-				} 
+					
+					traits.nm3[[eval(namestraits[t])]][,n]<-unlist(perm_ind.plot)
+				} 		
 				if(printprogress==T){
 					print(paste("nm.3",round(t/ntr*100,2),"%")) 
 				} 
@@ -903,17 +851,28 @@ com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, o
 		if(printprogress==T){print("calcul of null values using null models")}
 		
 		for(i in 1:nindex){
-			Null[[eval(namesindex[i])]] <- array(dim=c(ntr, ncom ,nperm))
+			if(nullmodels[i]==1){nm.bis<-traits.nm1[[1]]}
+			else if(nullmodels[i]==2){nm.bis<-traits.nm2[[1]]}
+			else if(nullmodels[i]==3){nm.bis<-traits.nm3[[1]]}
+			else{print("nullmodels need 1, 2 or 3")}
+			
+			functionindex= eval(index[i])
+			
+			dim2<-dim(apply(nm.bis, 2, function (x) eval(parse(text=functionindex))))[1]
+			Null[[eval(namesindex[i])]] <- array(NA, dim=c(ntr, dim2, nperm) )
+			
+			if(is.null(dim2)) {
+				Null[[eval(namesindex[i])]] <- array(NA, dim=c(ntr, 1, nperm) )
+			}
+			
 			for (t in 1: ntr){
 			
 				if(nullmodels[i]==1){nm<-traits.nm1[[t]]}
 				else if(nullmodels[i]==2){nm<-traits.nm2[[t]]}
 				else if(nullmodels[i]==3){nm<-traits.nm3[[t]]}
 				else{print("nullmodels need 1, 2 or 3")}
-					
-				functionindex= eval(index[i])
 				
-				Null[[eval(namesindex[i])]] [t,,] <- apply(nm, c(1,2), function (x) eval(parse(text=functionindex)))				
+				Null[[eval(namesindex[i])]] [t,,] <- apply(nm, 2, function (x) eval(parse(text=functionindex)))				
 		
 				if(printprogress==T){
 					print(paste(eval(namesindex[i]), round(t/ntr*100,2),"%")) 
@@ -930,23 +889,18 @@ com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, o
 	if(printprogress==T){print("calcul of observed values")}
 	
 	for(i in 1:nindex){
-			obs[[eval(namesindex[i])]] <- array(dim=c(ntr, ncom))
-	
-		if(obs.level[i]==3) {
-			traits.pop<-apply(traits, 2 , function (x) tapply(x, name_sp_plot, mean , na.rm=T))
-			interm<-lapply(strsplit(paste(rownames(traits.pop), sep="_"), split="_"), function(x) x[1])
 			functionindex= eval(index[i])
-			obs[[eval(namesindex[i])]] <- apply(traits.pop, 2, function (x) tapply(x, unlist(interm), function (x) eval(parse(text=functionindex))))	
+			obs[[eval(namesindex[i])]] <- array(dim=c(ntr, dim(apply(traits, 2, function (x) eval(parse(text=functionindex))))[1]))
+	
+		if(nullmodels[i]==3) {
+			traits.pop<-apply(traits, 2 , function (x) tapply(x, name_sp_sites, mean , na.rm=T))
+			obs[[eval(namesindex[i])]] <-  apply(traits.pop, 2, function (x) eval(parse(text=functionindex)))
 		}
 		
-		else if(obs.level[i]==1  |  obs.level[i]==2) {
-			interm<-lapply(strsplit(paste(name_sp_plot, sep="_"), split="_"), function(x) x[1])		
-			functionindex= eval(index[i])
-			obs[[eval(namesindex[i])]] <- apply(traits, 2, function (x) tapply(x, unlist(interm), function (x) eval(parse(text=functionindex))))
-			obs[[eval(namesindex[i])]] [ !is.finite(obs[[eval(namesindex[i])]] )]<-NA
-		
+		else if(nullmodels[i]==1  |  nullmodels[i]==2) {
+			obs[[eval(namesindex[i])]] <- apply(traits, 2, function (x) eval(parse(text=functionindex)))
+			#obs[[eval(namesindex[i])]] [ !is.finite(obs[[eval(namesindex[i])]] )]<-NA
 		}
-	
 		if(printprogress==T){
 			print(paste(round(i/nindex*100,2),"%")) 
 		} 
@@ -971,59 +925,20 @@ com.index<-function(traits=NULL, index=NULL, namesindex=NULL, nullmodels=NULL, o
 	for(i in 1:nindex){
 		com.index$list.index.t[[seq(1,nindex*2,by=2)[i]]]<-t(obs[[i]])
 		com.index$list.index[[seq(1,nindex*2,by=2)[i]]]<-obs[[i]]
-		com.index$list.index[[seq(1,nindex*2,by=2)[i]+1]]<-Null[[i]]
-		com.index$list.index.t[[seq(1,nindex*2,by=2)[i]+1]]<-Null[[i]]
 		name.com.index_list.index[seq(1,nindex*2,by=2)[i]]<-names(obs)[i]
-		name.com.index_list.index[seq(1,nindex*2,by=2)[i]+1]<-paste(names(Null)[i], "nm", sep="_")
 		
+		if(is.numeric(nperm)){
+			com.index$list.index[[seq(1,nindex*2,by=2)[i]+1]]<-Null[[i]]
+			com.index$list.index.t[[seq(1,nindex*2,by=2)[i]+1]]<-Null[[i]]
+			name.com.index_list.index[seq(1,nindex*2,by=2)[i]+1]<-paste(names(Null)[i], "nm", sep="_")
+		}
 	}
 	
-	names(com.index$list.index.t)<-name.com.index_list.index	
+	names(com.index$list.index.t)<-name.com.index_list.index
 	names(com.index$list.index)<-name.com.index_list.index
 		
-	com.index$plots_richness<-S
+	com.index$sites_richness<-S
 	com.index$namestraits<-namestraits
 	
 	return(com.index)
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Not very usefull
-plot.bar.com<-function(com.object=NULL, val.quant=c(0.025,0.975), col.com=c("red","purple","green", "orange","white"), ...){
-
-	com.i<-com.object
-	
-	ses.range<-ses(com.i$Range_obs, com.i$Null_range)
-	ses.mean<-ses(com.i$Mean_obs, com.i$Null_mean)
-	ses.CV<-ses(com.i$CV.NND_obs, com.i$Null_CV)
-	ses.kurtosis<-ses(com.i$kurtosis_obs, com.i$Null_kurtosis)
-    
-	df.bar<-barplot(rbind(rowMeans(na.omit(ses.range$ses)), rowMeans(na.omit(ses.mean$ses)), rowMeans(na.omit(ses.CV$ses)), rowMeans(na.omit(ses.kurtosis$ses)),0), beside=T, plot=F)
-	barplot(rbind(rowMeans(na.omit(ses.range$ses)), rowMeans(na.omit(ses.mean$ses)), rowMeans(na.omit(ses.CV$ses)), rowMeans(na.omit(ses.kurtosis$ses)),0), col=col.com, beside=T, ylim=c(min(c(ses.range$ses.inf, ses.mean$ses.inf, ses.CV$ses.inf, ses.kurtosis$ses.inf, colMeans(na.omit(ses.range$ses))-apply(na.omit(ses.range$ses), 2,sd), colMeans(na.omit(ses.mean$ses))-apply(na.omit(ses.mean$ses), 2,sd), colMeans(na.omit(ses.CV$ses))-apply(na.omit(ses.CV$ses), 2,sd), colMeans(na.omit(ses.kurtosis$ses))-apply(na.omit(ses.kurtosis$ses), 2,sd)), na.rm=T), max(c(colMeans(na.omit(ses.range$ses))+apply(na.omit(ses.range$ses), 2,sd), colMeans(na.omit(ses.mean$ses))+apply(na.omit(ses.mean$ses), 2,sd), colMeans(na.omit(ses.CV$ses))+apply(na.omit(ses.CV$ses), 2,sd), colMeans(na.omit(ses.kurtosis$ses))+apply(na.omit(ses.kurtosis$ses), 2,sd)), na.rm=T) ) )
-	segments( df.bar[1,], colMeans(na.omit(ses.range$ses))+apply(na.omit(ses.range$ses), 2,sd),df.bar[1,],colMeans(na.omit(ses.range$ses))-apply(na.omit(ses.range$ses), 2,sd))
-	segments( df.bar[2,], colMeans(na.omit(ses.mean$ses))+apply(na.omit(ses.mean$ses), 2,sd),df.bar[2,],colMeans(na.omit(ses.mean$ses))-apply(na.omit(ses.mean$ses), 2,sd))
-	segments( df.bar[3,], colMeans(na.omit(ses.CV$ses))+apply(na.omit(ses.CV$ses), 2,sd),df.bar[3,],colMeans(na.omit(ses.CV$ses))-apply(na.omit(ses.CV$ses), 2,sd))
-	segments( df.bar[4,], colMeans(na.omit(ses.kurtosis$ses))+apply(na.omit(ses.kurtosis$ses), 2,sd),df.bar[4,],colMeans(na.omit(ses.kurtosis$ses))-apply(na.omit(ses.kurtosis$ses), 2,sd))
-
-	points(type="l", df.bar[1,], rowMeans(ses.range$ses.inf, na.rm=T), col=col.com[1])
-	points(type="l", df.bar[2,], rowMeans(ses.mean$ses.inf, na.rm=T), col=col.com[2])
-	points(type="l", df.bar[3,], rowMeans(ses.CV$ses.inf, na.rm=T), col=col.com[3])
-	points(type="l", df.bar[4,], rowMeans(ses.kurtosis$ses.inf, na.rm=T), col=col.com[4])
-	
-	points(type="l", df.bar[1,], rowMeans(ses.range$ses.inf, na.rm=T), col=col.com[1])
-	points(type="l", df.bar[2,], rowMeans(ses.mean$ses.inf, na.rm=T), col=col.com[2])
-	points(type="l", df.bar[3,], rowMeans(ses.CV$ses.inf, na.rm=T), col=col.com[3])
-	points(type="l", df.bar[4,], rowMeans(ses.kurtosis$ses.inf, na.rm=T), col=col.com[4])
-	
 }

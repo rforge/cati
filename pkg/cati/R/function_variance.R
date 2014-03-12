@@ -1,9 +1,6 @@
 #### Partition of variance by nested anova (Messier et al, 2010)####
 # traits is the traits matrix and factors are the nested factors to take into account in the partition of variance
-partvar<-function(traits, factors, printprogress=TRUE, ...){
-	
-	require(nlme)
-	require(ape)
+partvar<-function(traits, factors, printprogress=TRUE){
 	
 	traits<-as.matrix(traits)
 	factors<-as.matrix(factors)
@@ -37,15 +34,18 @@ partvar<-function(traits, factors, printprogress=TRUE, ...){
 pie.partvar<-function(var.part, col.pie=NA){
   nfactors <- nrow(var.part)
   ntraits  <- ncol(var.part)
+  old.par<-par()
   par(mfrow=c(round(sqrt(ntraits))+1, round(sqrt(ntraits))))
   for (t in 1 : ntraits) {
-    pie(var.part[,t], main= colnames(var.part)[t], col=col.pie , label=rownames(var.part))
+    pie(var.part[,t], main= colnames(var.part)[t], col=col.pie , labels=rownames(var.part))
   }
+  par(old.par)
 }
 
 #barplot of variance partitionning
 bar.partvar<-function(var.part,  col.bar=NA, leg=FALSE){
-
+	
+	old.par<-par()
 	par(mar=c(5,6.5,4,2), cex=0.7)
 	
 	if(leg==FALSE)
@@ -54,5 +54,5 @@ bar.partvar<-function(var.part,  col.bar=NA, leg=FALSE){
 		{barplot(var.part, col=col.bar, las=1, horiz=T, legend.text=rownames(var.part), args.legend= list(cex=0.6), xlab="% of variance")}
 	
 	else{stop("leg must be TRUE or FALSE")}
-
+	 par(old.par)
 }
