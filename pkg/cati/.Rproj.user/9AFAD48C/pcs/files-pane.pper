@@ -1,0 +1,9 @@
+{
+    "path" : "~/cati",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
